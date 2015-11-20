@@ -13,7 +13,7 @@
 
 
 
-using namespace std;
+using namespace std; // ABCDEFG
 
 const int MAX_PARTICLES = 10000;
 const int NUM_NEIGHBOURING_PARTICLES = 40;
