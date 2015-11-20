@@ -1,3 +1,6 @@
+#include <iostream>
+#include <math.h>
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -8,8 +11,7 @@
 #endif
 #endif
 
-#include <iostream>
-#include <math.h>
+
 
 using namespace std;
 
@@ -25,7 +27,7 @@ struct Particle{
     float x, y, z, vx, vy, vz, ax, ay, az, angle, life, density, pressure;
     
     virtual Particle* find_neighborhood(){
-        Particle* particles;
+        Particle* particles = NULL;
         return particles;
     }
     
