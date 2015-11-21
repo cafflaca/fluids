@@ -123,6 +123,10 @@ Vec3 cross3(Vec3 a, Vec3 b){
 
 }
 
+Vec3 difVec3(Vec3 u, Vec3 v){
+	return Vec3(u.x-v.x,u.y-v.y,u.z-v.z);
+}
+
 double normVec3(Vec3 u){
 	return sqrt( dot3(u,u));
 }

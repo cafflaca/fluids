@@ -4,6 +4,7 @@
 #include <math.h>
 #include <cstring>
 
+const double PI = 3.14159;
 //Points
 struct Point3{
 	double x, y, z;
@@ -73,6 +74,8 @@ double dot3(Vec3 a, Vec3 b);
 double dot4(Vec4 a, Vec4 b);
 
 Vec3 difPoint3(Point3 A, Point3 B);
+
+Vec3 difVec3(Vec3 u, Vec3 v);
 
 Vec4 sumVec4(Vec4 A, Vec4 B);
 

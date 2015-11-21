@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "Particle.h"
+#include "Kernel.h"
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -12,73 +13,38 @@
 #endif
 #endif
 
+using namespace std; 
 
+const double REST_DENSITY = 1000;
+const double STIFFNESS_PARAMETER = 1000;
 
-
-using namespace std; // ABCDEFG
-
-const float REST_DENSITY = 1000;
-const float STIFFNESS_PARAMETER = 1000;
 //TODO: Ning's gravity coefficient and viscousity coefficient
 const float GRAVITY_COEFFICIENT = 9.8;
 const float VISCOUSITY_COEFFICIENT = 0.0091;
 
-<<<<<<< HEAD
-float compute_density(Particle* particles) {
-	// See p.35
+//Calculate density for each particle (at that position of that particle)
+double calculateDensity(Particle* particle) {
+	double h = 1.0; // radius aroun a given particle to look out for neighbours
+	Vec3 r;
+	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
+	double density = 0;
 
-	for (int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
+	for (int i = 0; i <listNeighbours.size(); i++)
 	{
-		float dx = x - particles[i].x;
-		float dy = y - particles[i].y;
-		float dz = z - particles[i].z;
-		float distance = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-		if (distance >= 0 && distance < RADIUS)
-		{
-			// Using poly6 smoothing kernel, see p.30
-			density += (315.f / (64.f * PI * pow(RADIUS, 9.f))) *
-				pow(pow(RADIUS, 2.f) - pow(distance, 2.f), 3.f);
-		}
+		r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
+		density += listNeighbours[i]->getMass()*applyKernelPoly6(r,h);
 	}
 
-	return PARTICLE_MASS * density;
+	return density;
 }
-=======
-struct Particle{
-	float x, y, z, vx, vy, vz, ax, ay, az, angle, life, density, pressure, fx, fy, fz;
+
+// Calculate pressure for each particle(at that position of that particle)
+  double calculatePressure(Particle* particle) {
+	  return STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
+   }
     
-    virtual Particle* find_neighborhood(){
-        Particle* particles = NULL;
-        return particles;
-    }
-    
-    float compute_density(Particle* particles) {
-        // See p.35
-        
-        for(int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
-        {
-            float dx = x - particles[i].x;
-            float dy = y - particles[i].y;
-            float dz = z - particles[i].z;
-            float distance = sqrtf((dx * dx) + (dy * dy) + (dz * dz));
-            if (distance >= 0 && distance < RADIUS)
-            {
-                // Using poly6 smoothing kernel, see p.30
-                density += (315.f / (64.f * PI * powf(RADIUS, 9.f))) *
-                powf(powf(RADIUS, 2.f) - powf(distance, 2.f), 3.f);
-            }
-        }
-        
-        return PARTICLE_MASS * density;
-    }
->>>>>>> 0f5789938691f3bc379947490518ffdbb2fb9c07
-    
-    float compute_pressure(float d) {
-        return pressure = STIFFNESS_PARAMETER * (d - REST_DENSITY);
-    }
-    
-    float compute_laplacian_of_pressure(Particle* particles){
-        float laplacian = 0;
+   double calculateLaplacianPressure(Particle* particle){
+        double laplacian = 0;
 
         // See p.33
         for(int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
