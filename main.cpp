@@ -22,9 +22,12 @@ const float RADIUS = 0.1f;
 const float PARTICLE_MASS = 1.0f; // Assuming all particles have the same mass
 const float REST_DENSITY = 1000;
 const float STIFFNESS_PARAMETER = 1000;
+//TODO: Ning's gravity coefficient and viscousity coefficient
+const float GRAVITY_COEFFICIENT = 9.8;
+const float VISCOUSITY_COEFFICIENT = 0.0091;
 
 struct Particle{
-    float x, y, z, vx, vy, vz, ax, ay, az, angle, life, density, pressure;
+	float x, y, z, vx, vy, vz, ax, ay, az, angle, life, density, pressure, fx, fy, fz;
     
     virtual Particle* find_neighborhood(){
         Particle* particles = NULL;
@@ -91,8 +94,92 @@ struct Particle{
             compute_laplacian_of_pressure(neighbors);
         }
     }
+
+	//TODO: Ning's force dencity
+	void compute_force_dencity(Particle* particles){
+		float mFx = 0, mFy = 0, mFz = 0;
+		for (int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
+		{
+			float dx = x - particles[i].x;
+			float dy = y - particles[i].y;
+			float dz = z - particles[i].z;
+			float distance = sqrtf((dx * dx) + (dy * dy) + (dz * dz));
+			float weight;
+			//presure part: - gradient p
+			weight = spiky_kernel_gradient(distance);
+			float mFp = -PARTICLE_MASS / particles[i].density*(pressure - particles[i].pressure)*weight;
+			mFx += mFp*dx;
+			mFy += mFp*dy;
+			mFz += mFp*dz;
+
+			//viscocity part: nu laplacia u
+			weight = viscous_kernel(distance);
+			mFx += VISCOUSITY_COEFFICIENT*PARTICLE_MASS*(particles[i].vx - vx) / particles[i].density*weight;
+			mFy += VISCOUSITY_COEFFICIENT*PARTICLE_MASS*(particles[i].vy - vy) / particles[i].density*weight;
+			mFz += VISCOUSITY_COEFFICIENT*PARTICLE_MASS*(particles[i].vz - vz) / particles[i].density*weight;
+		}
+		//gravity part: g
+		mFy += density*GRAVITY_COEFFICIENT*-1;
+
+		// force dencity
+		fx = mFx;
+		fy = mFy;
+		fz = mFz;
+	}
+
+	void compute_force_dencity(){
+
+		for (int i = 0; i < MAX_PARTICLES; i++)
+		{
+			Particle* neighbors = find_neighborhood();
+			compute_force_dencity(neighbors);
+		}
+	}
+	// End TODO Ning
     
 };
+
+//TODO: Ning's spiky kernel and viscous kernel
+float spiky_kernel(float distance){
+	float weight;
+	if (distance >= 0 && distance < RADIUS)
+	{
+		// Using poly6 smoothing kernel, see p.30
+		weight = (15.f / (PI * powf(RADIUS, 6.f))) *powf(RADIUS - distance, 3.f);
+	}
+	else{
+		weight = 0;
+	}
+	return weight;
+}
+
+float spiky_kernel_gradient(float distance){
+	float weight;
+	if (distance >= 0 && distance < RADIUS)
+	{
+		// Using poly6 smoothing kernel, see p.30
+		weight = (45.f / (PI * powf(RADIUS, 6.f))) / distance *powf(RADIUS - distance, 2.f);
+	}
+	else{
+		weight = 0;
+	}
+	return weight;
+}
+
+float viscous_kernel(float distance){
+	float weight;
+	if (distance >= 0 && distance < RADIUS)
+	{
+		// Using poly6 smoothing kernel, see p.30
+		weight = (15.f / (2 * PI * powf(RADIUS, 3.f))) *(-powf(distance, 3.f) / (2 * powf(RADIUS, 3.f)) + powf(distance, 2.f) / (powf(RADIUS, 2.f)) + RADIUS / (2 * distance) - 1);
+	}
+	else{
+		weight = 0;
+	}
+	return weight;
+}
+// End TODO Ning
+
 
 Particle particleContainer[MAX_PARTICLES];
 
