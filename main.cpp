@@ -1,5 +1,6 @@
 #include <iostream>
 #include <math.h>
+#include "Particle.h"
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -13,43 +14,31 @@
 
 
 
+
 using namespace std; // ABCDEFG
 
-const int MAX_PARTICLES = 10000;
-const int NUM_NEIGHBOURING_PARTICLES = 40;
-const float PI = 3.14159f;
-const float RADIUS = 0.1f;
-const float PARTICLE_MASS = 1.0f; // Assuming all particles have the same mass
 const float REST_DENSITY = 1000;
 const float STIFFNESS_PARAMETER = 1000;
 
-struct Particle{
-    float x, y, z, vx, vy, vz, ax, ay, az, angle, life, density, pressure;
-    
-    virtual Particle* find_neighborhood(){
-        Particle* particles = NULL;
-        return particles;
-    }
-    
-    float compute_density(Particle* particles) {
-        // See p.35
-        
-        for(int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
-        {
-            float dx = x - particles[i].x;
-            float dy = y - particles[i].y;
-            float dz = z - particles[i].z;
-            float distance = sqrtf((dx * dx) + (dy * dy) + (dz * dz));
-            if (distance >= 0 && distance < RADIUS)
-            {
-                // Using poly6 smoothing kernel, see p.30
-                density += (315.f / (64.f * PI * powf(RADIUS, 9.f))) *
-                powf(powf(RADIUS, 2.f) - powf(distance, 2.f), 3.f);
-            }
-        }
-        
-        return PARTICLE_MASS * density;
-    }
+float compute_density(Particle* particles) {
+	// See p.35
+
+	for (int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
+	{
+		float dx = x - particles[i].x;
+		float dy = y - particles[i].y;
+		float dz = z - particles[i].z;
+		float distance = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+		if (distance >= 0 && distance < RADIUS)
+		{
+			// Using poly6 smoothing kernel, see p.30
+			density += (315.f / (64.f * PI * pow(RADIUS, 9.f))) *
+				pow(pow(RADIUS, 2.f) - pow(distance, 2.f), 3.f);
+		}
+	}
+
+	return PARTICLE_MASS * density;
+}
     
     float compute_pressure(float d) {
         return pressure = STIFFNESS_PARAMETER * (d - REST_DENSITY);
