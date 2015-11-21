@@ -32,7 +32,7 @@ double calculateDensity(Particle* particle) {
 	for (int i = 0; i <listNeighbours.size(); i++)
 	{
 		r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
-		density += listNeighbours[i]->getMass()*applyKernelPoly6(r,h);
+		density += listNeighbours[i]->getMass()*Poly6_kernel(r,h);
 	}
 
 	return density;
@@ -125,44 +125,7 @@ double calculateDensity(Particle* particle) {
 };
 
 //TODO: Ning's spiky kernel and viscous kernel
-float spiky_kernel(float distance){
-	float weight;
-	if (distance >= 0 && distance < RADIUS)
-	{
-		// Using poly6 smoothing kernel, see p.30
-		weight = (15.f / (PI * powf(RADIUS, 6.f))) *powf(RADIUS - distance, 3.f);
-	}
-	else{
-		weight = 0;
-	}
-	return weight;
-}
 
-float spiky_kernel_gradient(float distance){
-	float weight;
-	if (distance >= 0 && distance < RADIUS)
-	{
-		// Using poly6 smoothing kernel, see p.30
-		weight = (45.f / (PI * powf(RADIUS, 6.f))) / distance *powf(RADIUS - distance, 2.f);
-	}
-	else{
-		weight = 0;
-	}
-	return weight;
-}
-
-float viscous_kernel(float distance){
-	float weight;
-	if (distance >= 0 && distance < RADIUS)
-	{
-		// Using poly6 smoothing kernel, see p.30
-		weight = (15.f / (2 * PI * powf(RADIUS, 3.f))) *(-powf(distance, 3.f) / (2 * powf(RADIUS, 3.f)) + powf(distance, 2.f) / (powf(RADIUS, 2.f)) + RADIUS / (2 * distance) - 1);
-	}
-	else{
-		weight = 0;
-	}
-	return weight;
-}
 // End TODO Ning
 
 
