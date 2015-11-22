@@ -1,3 +1,6 @@
+#include <iostream>
+#include <math.h>
+
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
@@ -8,15 +11,13 @@
 #endif
 #endif
 
-#include <iostream>
-#include <math.h>
-
 using namespace std; // ABCDEFG
 
 const int MAX_PARTICLES = 10000;
 const int NUM_NEIGHBOURING_PARTICLES = 40;
 const float PI = 3.14159f;
 const float RADIUS = 0.1f;
+const float PARTICLE_RADIUS = 0.01;
 const float PARTICLE_MASS = 1.0f; // Assuming all particles have the same mass
 const float REST_DENSITY = 1000;
 const float STIFFNESS_PARAMETER = 1000;
@@ -87,6 +88,21 @@ struct Particle{
             float d = compute_density(neighbors);
             compute_pressure(d);
             compute_laplacian_of_pressure(neighbors);
+        }
+    }
+    
+    void detect_collision(){
+        Particle* particles = find_neighborhood();
+
+        for(int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++){
+            float dx = x - particles[i].x;
+            float dy = y - particles[i].y;
+            float dz = z - particles[i].z;
+            float distance = sqrtf((dx * dx) + (dy * dy) + (dz * dz));
+            
+            if(distance < 2 * PARTICLE_RADIUS){
+                
+            }
         }
     }
     
