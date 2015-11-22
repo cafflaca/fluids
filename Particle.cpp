@@ -3,18 +3,18 @@
 int Particle::countParticles = 0;
 std::vector<Particle*> Particle::particles;
 
-Particle::Particle(Vec3 position, Vec3 velocity, Vec3 acceleration){
+Particle::Particle(Vec3 position, Vec3 velocity){
 	this->position = position;
 	this->velocity = velocity;
-	this->acceleration = acceleration;
-	density=1.0;
+	density = DENSITY_WATER;
 	pressure=1.0;
-	mass = density*1.0;
+	mass = density*VOLUMEN / NUMBER_PARTICLES; //rho*V/MAX_PARTICLES
 	
 	label = countParticles; // 0 to totalNumb -1
 	countParticles++;
 	particles.push_back(this);
 }
+
 
 std::vector<Particle*>Particle::find_neighborhood(double  h){
 	double distance = 0;
