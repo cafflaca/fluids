@@ -10,6 +10,17 @@ double Poly6_kernel(Vec3 pos, double h){
 	return kernel;
 }
 
+double Poly6_kernel_gradient(Vec3 pos, double h){
+	double kernel = 0;
+	double distance = normVec3(pos);
+	if (distance >= 0 && distance <= h)
+	{
+		// Using the gradient of the poly6 smoothing kernel, see p.30
+		kernel = (315 / (64 * PI * pow(h, 9))) *
+			(3 * pow(pow(h, 2) - pow(distance, 2), 2)) * (-2 * distance);
+	}
+	return kernel;
+}
 
 double spiky_kernel(Vec3 pos, double h){
 	double kernel = 0;
