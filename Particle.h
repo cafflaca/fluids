@@ -35,6 +35,7 @@ public:
 	Vec3 getVelocity(){ return velocity; };
 	double getMass(){ return mass; };
 	double getDensity(){ return density; };
+	double getPressure(){ return pressure; };
 	std::vector<Particle*> find_neighborhood(double  h);
 	
 

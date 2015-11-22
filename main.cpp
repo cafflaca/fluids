@@ -19,8 +19,8 @@ const double REST_DENSITY = 1000;
 const double STIFFNESS_PARAMETER = 1000;
 
 //TODO: Ning's gravity coefficient and viscousity coefficient
-const float GRAVITY_COEFFICIENT = 9.8;
-const float VISCOUSITY_COEFFICIENT = 0.0091;
+const double GRAVITY_COEFFICIENT = 9.819;
+const double VISCOUSITY_COEFFICIENT = 0.0091;
 
 //Calculate density for each particle (at that position of that particle)
 double calculateDensity(Particle* particle) {
@@ -45,30 +45,24 @@ double calculateDensity(Particle* particle) {
     
    double calculateLaplacianPressure(Particle* particle){
         double laplacian = 0;
-
+		Vec3 r;
+		double h = 1.0;
+		std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
         // See p.33
-        for(int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
+		for (unsigned i = 0; i < listNeighbours.size(); i++)
         {
-            float dx = x - particles[i].x;
-            float dy = y - particles[i].y;
-            float dz = z - particles[i].z;
-            float distance = sqrtf((dx * dx) + (dy * dy) + (dz * dz));
-            if (distance >= 0 && distance < RADIUS)
-            {
-                // Using the gradient of the poly6 smoothing kernel, see p.30
-                float sk = (315.f / (64.f * PI * powf(RADIUS, 9.f))) *
-                (3.f * powf(powf(RADIUS, 2.f) - powf(distance, 2.f), 2.f)) * (-2.f * distance);
-                
-                laplacian += (1.f / particles[i].density ) * particles[i].pressure * sk;
-            }
+			r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
+			laplacian += (1.0 / listNeighbours[i]->getDensity()) * listNeighbours[i]->getPressure() * Poly6_kernel_gradient(r, h);
+            
         }
         
-        laplacian *= PARTICLE_MASS;
+        laplacian *= particle->getMass();
         
         return laplacian;
     }
+
     
-    void compute_density_and_pressure(){
+    /*void compute_density_and_pressure(){
      
         for(int i = 0; i < MAX_PARTICLES; i++)
         {
@@ -78,41 +72,45 @@ double calculateDensity(Particle* particle) {
             compute_pressure(d);
             compute_laplacian_of_pressure(neighbors);
         }
-    }
+    }*/
 
 	//TODO: Ning's force dencity
-	void compute_force_dencity(Particle* particles){
-		float mFx = 0, mFy = 0, mFz = 0;
-		for (int i = 0; i < NUM_NEIGHBOURING_PARTICLES; i++)
+	void compute_force_density(Particle* particle){
+		Vec3 mF;
+		double mFp; // You have to initialize please, I dont know if you initialize this variable.
+		double h = 1.0; // radius aroun a given particle to look out for neighbours
+		Vec3 r;
+		std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
+		double weight;
+		//float mFx = 0, mFy = 0, mFz = 0;
+		for (int i = 0; i < listNeighbours.size(); i++)
 		{
-			float dx = x - particles[i].x;
-			float dy = y - particles[i].y;
-			float dz = z - particles[i].z;
-			float distance = sqrtf((dx * dx) + (dy * dy) + (dz * dz));
-			float weight;
+			r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
+			
 			//presure part: - gradient p
-			weight = spiky_kernel_gradient(distance);
-			float mFp = -PARTICLE_MASS / particles[i].density*(pressure - particles[i].pressure)*weight;
-			mFx += mFp*dx;
-			mFy += mFp*dy;
-			mFz += mFp*dz;
+			weight = spiky_kernel_gradient(r,h);
+			mFp = -particle->getMass() / listNeighbours[i]->getDensity()*(particle->getPressure() - listNeighbours[i]->getPressure())*weight;
+			mF.x += mFp*r.x;
+			mF.y += mFp*r.y;
+			mF.z += mFp*r.z;
 
 			//viscocity part: nu laplacia u
-			weight = viscous_kernel(distance);
-			mFx += VISCOUSITY_COEFFICIENT*PARTICLE_MASS*(particles[i].vx - vx) / particles[i].density*weight;
-			mFy += VISCOUSITY_COEFFICIENT*PARTICLE_MASS*(particles[i].vy - vy) / particles[i].density*weight;
-			mFz += VISCOUSITY_COEFFICIENT*PARTICLE_MASS*(particles[i].vz - vz) / particles[i].density*weight;
+			weight = viscous_kernel(r,h);
+			mF.x += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().x - particle->getVelocity().x) / listNeighbours[i]->getDensity()*weight;
+			mF.y += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().y - particle->getVelocity().y) / listNeighbours[i]->getDensity()*weight;
+			mF.z += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().z - particle->getVelocity().z) / listNeighbours[i]->getDensity()*weight;
 		}
 		//gravity part: g
-		mFy += density*GRAVITY_COEFFICIENT*-1;
+		mF.y += particle->getDensity()*GRAVITY_COEFFICIENT*-1;
 
-		// force dencity
-		fx = mFx;
-		fy = mFy;
-		fz = mFz;
+		// force density
+		Vec3 force;
+		force.x = mF.x;
+		force.y = mF.y;
+		force.z = mF.z;
 	}
 
-	void compute_force_dencity(){
+	/*void compute_force_dencity(){
 
 		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
@@ -122,14 +120,14 @@ double calculateDensity(Particle* particle) {
 	}
 	// End TODO Ning
     
-};
+};*/
 
 //TODO: Ning's spiky kernel and viscous kernel
 
 // End TODO Ning
 
 
-Particle particleContainer[MAX_PARTICLES];
+//Particle particleContainer[MAX_PARTICLES];
 
 
 
