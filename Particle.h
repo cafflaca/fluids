@@ -39,7 +39,8 @@ public:
 	Vec3 getVelocity(){ return velocity; };
 	double getMass(){ return mass; };
 	double getDensity(){ return density; };
-	double getPressure(){ return pressure; };
+	double getPressure(){ return pressure; }; //get pressuare at the position of the particle i
+	std::vector<Particle*>  getParticleSample(){ return particles; }; //Return the list of all particles in the system
 	std::vector<Particle*> find_neighborhood(double  h);
 	
 
