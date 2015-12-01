@@ -2,6 +2,8 @@
 #include <math.h>
 #include "Particle.h"
 #include "Kernel.h"
+#include "Integration.h"
+#include "Collision.h"
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -22,9 +24,12 @@ const double STIFFNESS_PARAMETER = 1000;
 const double GRAVITY_COEFFICIENT = 9.819;
 const double VISCOUSITY_COEFFICIENT = 0.0091;
 
+int oldTime;
+bool startAnimation;
+
 //Calculate density for each particle (at that position of that particle)
 double calculateDensity(Particle* particle) {
-	double h = 1.0; // radius aroun a given particle to look out for neighbours
+    double h = PARTICLE_RADIUS * 3;//1.0; // radius aroun a given particle to look out for neighbours
 	Vec3 r;
 	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
 	double density = 0;
@@ -46,7 +51,7 @@ double calculateDensity(Particle* particle) {
    double calculateLaplacianPressure(Particle* particle){
         double laplacian = 0;
 		Vec3 r;
-		double h = 1.0;
+		double h = PARTICLE_RADIUS * 3;//1.0;
 		std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
         // See p.33
 		for (unsigned i = 0; i < listNeighbours.size(); i++)
@@ -75,10 +80,10 @@ double calculateDensity(Particle* particle) {
     }*/
 
 	//TODO: Ning's force dencity
-	void compute_force_density(Particle* particle){
+	Vec3 compute_force_density(Particle* particle){
 		Vec3 mF;
 		double mFp; // You have to initialize please, I dont know if you initialize this variable.
-		double h = 1.0; // radius aroun a given particle to look out for neighbours
+		double h = PARTICLE_RADIUS * 3;//1.0; // radius aroun a given particle to look out for neighbours
 		Vec3 r;
 		std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
 		double weight;
@@ -108,6 +113,8 @@ double calculateDensity(Particle* particle) {
 		force.x = mF.x;
 		force.y = mF.y;
 		force.z = mF.z;
+        
+        return force;
 	}
 
 	/*void compute_force_dencity(){
@@ -129,19 +136,91 @@ double calculateDensity(Particle* particle) {
 
 //Particle particleContainer[MAX_PARTICLES];
 
+void set_initial_particle_positions(){
+    Vec3 initialVelocity = Vec3(0, 0, 0);
+    
+    for (int k = 0; k < PARTICLE_BLOCK_HEIGHT; k++) {
+        for (int j = 0; j < PARTICLE_BLOCK_WIDTH; j++) {
+            for (int i = 0; i < PARTICLE_BLOCK_LENGTH; i++) {
+                new Particle(
+                        Vec3(
+                            (double)((double)i * PARTICLE_RADIUS * 2.0),
+                            (double)j * PARTICLE_RADIUS * 2.0,
+                            (double)k * PARTICLE_RADIUS * 2.0
+                            ),
+                            initialVelocity);
+            }
+        }
+    }
+}
 
+void draw_particles() {
+    Vec3 pos = Vec3(0, 0, 0);
+    
+    for (int i = 0; i < Particle::particles.size(); i++) {
+        glPushMatrix();
+        glLoadIdentity();
+        pos = Particle::particles[i]->position;
+        glTranslated(pos.x, pos.y, pos.z);
+        glutSolidSphere(0.05, 100, 100);
+        glPopMatrix();
+    }
+    glPopMatrix();
+}
+
+void initialize() {
+    set_initial_particle_positions();
+    startAnimation = false;
+    oldTime = 0;
+}
 
 void keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case 27:
             exit(0);
             break;
+        case 32:
+            startAnimation ? startAnimation = false : startAnimation = true;
+            break;
     }
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glutSolidSphere(0.05, 100, 100);
+    double newTime = glutGet(GLUT_ELAPSED_TIME);
+    double timeStep = 0.03;//newTime - oldTime;
+    Vec3 force;
+    int size = Particle::particles.size();
+    int i;
+    for (i = 0; i < size; i++) {
+        Particle::particles[i]->find_neighborhood(PARTICLE_RADIUS * 3);
+        //cout << " PASS 1" << endl;
+    }
+    
+    for (i = 0; i < size; i++) {
+        calculateDensity(Particle::particles[i]);
+        Particle::particles[i]->pressure = calculatePressure(Particle::particles[i]);
+        calculateLaplacianPressure(Particle::particles[i]);
+        //cout << " PASS 2" << endl;
+    }
+    
+    for (i = 0; i < size; i++) {
+        Particle::particles[i]->force_densities = compute_force_density(Particle::particles[i]);
+        //cout << " PASS 3" << endl;
+    }
+    
+    for (i = 0; i < size; i++) {
+        Vec3 velocity = nextVelocity(Particle::particles[i], Particle::particles[i]->force_densities, timeStep);
+        nextStep(Particle::particles[i], velocity, timeStep);
+        //handle_collision(Particle::particles[i], detect_particle_collision(Particle::particles[i]), timeStep);
+        //handle_collision(Particle::particles[i], detect_boundary_collision(Particle::particles[i]), timeStep);
+        //cout << " PASS 4" << endl;
+    }
+    
+    draw_particles();
+    
+    oldTime = newTime;
+    cout << " PASS" << endl;
     glutSwapBuffers();
 }
 
@@ -152,6 +231,7 @@ int main(int argc, char * argv[]) {
     glutInitWindowSize(500, 500);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Fluid Simulation");
+    initialize();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 

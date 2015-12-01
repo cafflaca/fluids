@@ -29,6 +29,4 @@ std::vector<Particle*>Particle::find_neighborhood(double  h){
 	}
 	return list;
 }
-
-
  

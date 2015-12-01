@@ -187,6 +187,11 @@ Vec4 multscalarVec4(Vec4 A, double b){
 	return Vec4(A.x*b, A.y*b, A.z*b, A.w*b);
 }
 
+Vec3 multscalarVec3(Vec3 A, double b){
+    
+    return Vec3(A.x*b, A.y*b, A.z*b);
+}
+
 Vec4 sumVec4(Vec4 A, Vec4 B){
 
 	return Vec4(A.x + B.x, A.y + B.y, A.z + B.z, A.w + B.w);
