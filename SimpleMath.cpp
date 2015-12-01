@@ -196,6 +196,10 @@ Vec3 sumVec3(Vec3 A, Vec3 B){
 	return Vec3(A.x + B.x, A.y + B.y, A.z + B.z);
 }
 
+Vec3 multscalarVec3(Vec3 A, double b){
+	return Vec3(b*A.x,b*A.y,b*A.z);
+}
+
 Mat4 sumMatrix4(Mat4 A, Mat4 B){
 	Mat4 C;
 	for (unsigned i = 0; i < 16; i++){
