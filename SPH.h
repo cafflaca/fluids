@@ -1,5 +1,10 @@
 #pragma once
-#include "SimpleMath.h"
 #include "Particle.h"
+#include "BasicLagrangian.h"
+#include "Integration.h"
 
-const double H = pow(3 * VOLUMEN*NUM_KERNEL_PARTICLES / 4 * PI*NUMBER_PARTICLES, 1.0 / 3);
+
+//ToDo
+std::vector<Particle*> setInitialConditions();
+
+void testRun();
