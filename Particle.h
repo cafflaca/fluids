@@ -24,9 +24,7 @@ private:
 	double mass;
 	double density;
 	double pressure;
-	//double angle;
-	//double life;
-	//Vec3 acceleration;
+
 	
 	int label;//Numb. of the particle
 	static int countParticles;//How many particles has been created
@@ -42,6 +40,10 @@ public:
 	double getPressure(){ return pressure; }; //get pressuare at the position of the particle i
 	std::vector<Particle*>  getParticleSample(){ return particles; }; //Return the list of all particles in the system
 	std::vector<Particle*> find_neighborhood(double  h);
+	void setPosition(Vec3 pos);
+	void setVelocity(Vec3 vel);
+	void setDensity(double density);
+	void setPressure(double pressure);
 	
 
 };

@@ -20,7 +20,7 @@ double calculateTotalDensity(Particle* particle) {
 /*Calculate density in the position of the particle i*/
 double calculateDensity(Particle* particle) {
 	double density = 0;
-	std::vector<Particle*> particles = particle->getParticleSample();
+	std::vector<Particle*> particles = particle->find_neighborhood(H);
 	Vec3 r;
 
 	for (unsigned i = 0; i < particles.size();i++){
@@ -59,7 +59,7 @@ Vec3 calculateGradientPressure(Particle* particle){
 	Vec3 r;
 	double temp;
 
-	std::vector<Particle*> particles = particle->getParticleSample();
+	std::vector<Particle*> particles = particle->find_neighborhood(H);
 	
 	for (unsigned i = 0; i < particles.size(); i++)
 	{
@@ -121,7 +121,7 @@ Vec3 calculateGradientPressure(Particle* particle){
 		Vec3 r;
 		Vec3 vel;
 		double temp;
-		std::vector<Particle*> particles = particle->getParticleSample();
+		std::vector<Particle*> particles = particle->find_neighborhood(H);
 
 		for (unsigned i = 0; i < particles.size(); i++)
 		{

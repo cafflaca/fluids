@@ -30,5 +30,18 @@ std::vector<Particle*>Particle::find_neighborhood(double  h){
 	return list;
 }
 
+void Particle::setPosition(Vec3 pos){
+	this->position = pos;
+}
+void Particle::setVelocity(Vec3 vel){
+	this->velocity = vel;
+}
+void Particle::setDensity(double density){
+	this->density = density;
+}
+void Particle::setPressure(double pressure){
+	this->pressure = pressure;
+}
+
 
  
