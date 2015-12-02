@@ -76,6 +76,9 @@ double dot4(Vec4 a, Vec4 b);
 Vec3 difPoint3(Point3 A, Point3 B);
 
 Vec3 difVec3(Vec3 u, Vec3 v);
+Vec3 sumVec3(Vec3 A, Vec3 B);
+
+Vec3 multscalarVec3(Vec3 A, double b);
 
 Vec4 sumVec4(Vec4 A, Vec4 B);
 
