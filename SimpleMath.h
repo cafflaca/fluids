@@ -104,4 +104,6 @@ Mat4 multscalarMat4(Mat4 A, double b);
 
 Mat4 sumMatrix4(Mat4 A, Mat4 B);
 
+void invertMatrix(const double * m, double * out);
+
 #endif

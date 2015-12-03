@@ -1,10 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "Particle.h"
-#include "Kernel.h"
-#include "Integration.h"
-#include "Collision.h"
-#include "BasicLagrangian.h"
+
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -18,211 +15,205 @@
 
 using namespace std; 
 
-//const double REST_DENSITY = 1000;
-//const double STIFFNESS_PARAMETER = 1000;
 
-//TODO: Ning's gravity coefficient and viscousity coefficient
-//const double GRAVITY_COEFFICIENT = 9.819;
-//const double VISCOUSITY_COEFFICIENT = 0.0091;
+//Model matrices
+double _matrix[16];
+double _matrixI[16];
+/* Mouse Interface  */
+int _mouseX = 0;		/* mouse control variables */
+int _mouseY = 0;
+bool _mouseLeft = false;
+bool _mouseMiddle = false;
+bool _mouseRight = false;
 
-int oldTime;
-bool startAnimation;
 
-//Calculate density for each particle (at that position of that particle)
-/*double calculateDensity(Particle* particle) {
-    double h = PARTICLE_RADIUS * 3;//1.0; // radius aroun a given particle to look out for neighbours
-	Vec3 r;
-	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
-	double density = 0;
+double _dragPosX = 0.0;
+double _dragPosY = 0.0;
+double _dragPosZ = 0.0;
 
-	for (int i = 0; i <listNeighbours.size(); i++)
-	{
-		r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
-		density += listNeighbours[i]->getMass()*Poly6_kernel(r,h);
-	}
+//Window parameters
+int width = 1024;
+int height = 768;
+///* Ortho (if used) */
+double _left = 0.0;		/* ortho view volume params */
+double _right = 0.0;
+double _bottom = 0.0;
+double _top = 0.0;
+double _zNear = 0.1;
+double _zFar = 50.0;
+double fovy = 45.0;
+double prev_z = 0;
 
-	return density;
+
+double vlen(double x, double y, double z)
+{
+	return sqrt(x * x + y * y + z * z);
 }
 
-// Calculate pressure for each particle(at that position of that particle)
-  double calculatePressure(Particle* particle) {
-	  return STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
-   }*/
-    
-   double calculateLaplacianPressure(Particle* particle){
-        double laplacian = 0;
-		Vec3 r;
-		double h = PARTICLE_RADIUS * 3;//1.0;
-		std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
-        // See p.33
-		for (unsigned i = 0; i < listNeighbours.size(); i++)
-        {
-			r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
-			laplacian += (1.0 / listNeighbours[i]->getDensity()) * listNeighbours[i]->getPressure() * Poly6_kernel(r, h);
-            
-        }
-        
-        laplacian *= particle->getMass();
-        
-        return laplacian;
-    }
-
-    
-    /*void compute_density_and_pressure(){
-     
-        for(int i = 0; i < MAX_PARTICLES; i++)
-        {
-            Particle* neighbors = find_neighborhood();
-            
-            float d = compute_density(neighbors);
-            compute_pressure(d);
-            compute_laplacian_of_pressure(neighbors);
-        }
-    }*/
-
-	//TODO: Ning's force dencity
-	Vec3 compute_force_density(Particle* particle){
-		Vec3 mF;
-		double mFp; // You have to initialize please, I dont know if you initialize this variable.
-		double h = PARTICLE_RADIUS * 3;//1.0; // radius aroun a given particle to look out for neighbours
-		Vec3 r;
-		std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
-		double weight;
-		//float mFx = 0, mFy = 0, mFz = 0;
-		for (int i = 0; i < listNeighbours.size(); i++)
-		{
-			r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
-			
-			//presure part: - gradient p
-			weight = spiky_kernel(r,h);
-			mFp = -particle->getMass() / listNeighbours[i]->getDensity()*(particle->getPressure() - listNeighbours[i]->getPressure())*weight;
-			mF.x += mFp*r.x;
-			mF.y += mFp*r.y;
-			mF.z += mFp*r.z;
-
-			//viscocity part: nu laplacia u
-			weight = viscosity_kernel(r,h);
-			mF.x += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().x - particle->getVelocity().x) / listNeighbours[i]->getDensity()*weight;
-			mF.y += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().y - particle->getVelocity().y) / listNeighbours[i]->getDensity()*weight;
-			mF.z += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().z - particle->getVelocity().z) / listNeighbours[i]->getDensity()*weight;
-		}
-		//gravity part: g
-		mF.y += particle->getDensity()*GRAVITY_COEFFICIENT*-1;
-
-		// force density
-		Vec3 force;
-		force.x = mF.x;
-		force.y = mF.y;
-		force.z = mF.z;
-        
-        return force;
-	}
-
-	/*void compute_force_dencity(){
-
-		for (int i = 0; i < MAX_PARTICLES; i++)
-		{
-			Particle* neighbors = find_neighborhood();
-			compute_force_dencity(neighbors);
-		}
-	}
-	// End TODO Ning
-    
-};*/
-
-//TODO: Ning's spiky kernel and viscous kernel
-
-// End TODO Ning
-
-
-//Particle particleContainer[MAX_PARTICLES];
-
-void set_initial_particle_positions(){
-    Vec3 initialVelocity = Vec3(0, 0, 0);
-    
-    for (int k = 0; k < PARTICLE_BLOCK_HEIGHT; k++) {
-        for (int j = 0; j < PARTICLE_BLOCK_WIDTH; j++) {
-            for (int i = 0; i < PARTICLE_BLOCK_LENGTH; i++) {
-                new Particle(
-                        Vec3(
-                            (double)((double)i * PARTICLE_RADIUS * 2.0),
-                            (double)j * PARTICLE_RADIUS * 2.0,
-                            (double)k * PARTICLE_RADIUS * 2.0
-                            ),
-                            initialVelocity);
-            }
-        }
-    }
-}
-
-void draw_particles() {
-    Vec3 pos = Vec3(0, 0, 0);
-    
-    for (int i = 0; i < Particle::particles.size(); i++) {
-        glPushMatrix();
-        glLoadIdentity();
-        pos = Particle::particles[i]->position;
-        glTranslated(pos.x, pos.y, pos.z);
-        glutSolidSphere(0.05, 100, 100);
-        glPopMatrix();
-    }
-    glPopMatrix();
-}
-
-void initialize() {
-    set_initial_particle_positions();
-    startAnimation = false;
-    oldTime = 0;
-}
 
 void keyboard(unsigned char key, int x, int y) {
     switch(key) {
         case 27:
             exit(0);
             break;
-        case 32:
-            startAnimation ? startAnimation = false : startAnimation = true;
-            break;
     }
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    double newTime = glutGet(GLUT_ELAPSED_TIME);
-    double timeStep = 0.03;//newTime - oldTime;
-    Vec3 force;
-    int size = Particle::particles.size();
-    int i;
-    for (i = 0; i < size; i++) {
-        Particle::particles[i]->find_neighborhood(PARTICLE_RADIUS * 3);
-        //cout << " PASS 1" << endl;
-    }
-    
-    for (i = 0; i < size; i++) {
-        calculateDensity(Particle::particles[i]);
-        Particle::particles[i]->pressure = calculatePressure(Particle::particles[i]);
-        calculateLaplacianPressure(Particle::particles[i]);
-        //cout << " PASS 2" << endl;
-    }
-    
-    for (i = 0; i < size; i++) {
-        Particle::particles[i]->force_densities = compute_force_density(Particle::particles[i]);
-        //cout << " PASS 3" << endl;
-    }
-    
-    for (i = 0; i < size; i++) {
-        Vec3 velocity = nextVelocity(Particle::particles[i], Particle::particles[i]->force_densities, timeStep);
-        nextStep(Particle::particles[i], velocity, timeStep);
-        //handle_collision(Particle::particles[i], detect_particle_collision(Particle::particles[i]), timeStep);
-        //handle_collision(Particle::particles[i], detect_boundary_collision(Particle::particles[i]), timeStep);
-        //cout << " PASS 4" << endl;
-    }
-    
-    draw_particles();
-    
-    oldTime = newTime;
-    cout << " PASS" << endl;
+    glutSolidSphere(0.05, 100, 100);
     glutSwapBuffers();
+}
+
+
+
+
+void pos(double *px, double *py, double *pz, const int x, const int y,
+	const int *viewport)
+{
+	/*
+	Use the ortho projection and viewport information
+	to map from mouse co-ordinates back into world
+	co-ordinates
+	*/
+
+	*px = (double)(x - viewport[0]) / (double)(viewport[2]);
+	*py = (double)(y - viewport[1]) / (double)(viewport[3]);
+
+	*px = _left + (*px) * (_right - _left);
+	*py = _top + (*py) * (_bottom - _top);
+	*pz = _zNear;
+}
+
+void getMatrix()
+{
+	glGetDoublev(GL_MODELVIEW_MATRIX, _matrix);
+	invertMatrix(_matrix, _matrixI);
+}
+
+void mouseMoveEvent(int x, int y)
+{
+
+	bool changed = false;
+
+	const int dx = x - _mouseX;
+	const int dy = y - _mouseY;
+
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	if (dx == 0 && dy == 0)
+		return;
+
+	if (_mouseMiddle || (_mouseLeft && _mouseRight)) {
+		/* double s = exp((double)dy*0.01); */
+		/* glScalef(s,s,s); */
+		/* if(abs(prev_z) <= 1.0) */
+
+		glLoadIdentity();
+		glTranslatef(0, 0, dy * 0.01);
+		glMultMatrixd(_matrix);
+
+		changed = true;
+	}
+	else if (_mouseLeft) {
+		double ax, ay, az;
+		double bx, by, bz;
+		double angle;
+
+		ax = dy;
+		ay = dx;
+		az = 0.0;
+		angle = vlen(ax, ay, az) / (double)(viewport[2] + 1) * 180.0;
+
+		/* Use inverse matrix to determine local axis of rotation */
+
+		bx = _matrixI[0] * ax + _matrixI[4] * ay + _matrixI[8] * az;
+		by = _matrixI[1] * ax + _matrixI[5] * ay + _matrixI[9] * az;
+		bz = _matrixI[2] * ax + _matrixI[6] * ay + _matrixI[10] * az;
+
+		glRotatef(angle, bx, by, bz);
+
+		changed = true;
+	}
+	else if (_mouseRight) {
+		double px, py, pz;
+
+		pos(&px, &py, &pz, x, y, viewport);
+
+		glLoadIdentity();
+		glTranslatef(px - _dragPosX, py - _dragPosY, pz - _dragPosZ);
+		glMultMatrixd(_matrix);
+
+		_dragPosX = px;
+		_dragPosY = py;
+		_dragPosZ = pz;
+
+		changed = true;
+	}
+
+	_mouseX = x;
+	_mouseY = y;
+
+	if (changed) {
+		getMatrix();
+		glutPostRedisplay();
+	}
+
+	
+}
+
+void mouseEvent(int button, int state, int x, int y)
+{
+	int viewport[4];
+
+	_mouseX = x;
+	_mouseY = y;
+
+	if (state == GLUT_UP)
+		switch (button) {
+		case GLUT_LEFT_BUTTON:
+			_mouseLeft = false;
+			break;
+		case GLUT_MIDDLE_BUTTON:
+			_mouseMiddle = false;
+			break;
+		case GLUT_RIGHT_BUTTON:
+			_mouseRight = false;
+			break;
+	}
+	else
+		switch (button) {
+		case GLUT_LEFT_BUTTON:
+			_mouseLeft = true;
+			break;
+		case GLUT_MIDDLE_BUTTON:
+			_mouseMiddle = true;
+			break;
+		case GLUT_RIGHT_BUTTON:
+			_mouseRight = true;
+			break;
+		case 4:         //Zoomout
+			glLoadIdentity();
+			glTranslatef(0, 0, -0.1);
+			glMultMatrixd(_matrix);
+			getMatrix();
+			glutPostRedisplay();
+			break;
+		case 3:         //Zoomin
+			glLoadIdentity();
+			glTranslatef(0, 0, 0.1);
+			glMultMatrixd(_matrix);
+			getMatrix();
+			glutPostRedisplay();
+			break;
+		default:
+			break;
+			//std::cout<<button<<std::endl;
+	}
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	pos(&_dragPosX, &_dragPosY, &_dragPosZ, x, y, viewport);
 }
 
 int main(int argc, char * argv[]) {
@@ -232,9 +223,12 @@ int main(int argc, char * argv[]) {
     glutInitWindowSize(500, 500);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Fluid Simulation");
-    initialize();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+
+	//mouse interface
+	glutMouseFunc(mouseEvent);
+	glutMotionFunc(mouseMoveEvent);
 
     
     glutMainLoop();
