@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "Particle.h"
+#include "SPH.h"
 
 
 #ifdef __APPLE__
@@ -45,7 +46,7 @@ double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
 
-void set_initial_particle_positions(){
+/*void set_initial_particle_positions(){
     Vec3 initialVelocity = Vec3(0, 0, 0);
     
     for (int k = 0; k < PARTICLE_BLOCK_HEIGHT; k++) {
@@ -61,7 +62,7 @@ void set_initial_particle_positions(){
             }
         }
     }
-}
+}*/
 
 void draw_particles() {
     Vec3 pos = Vec3(0, 0, 0);
@@ -78,7 +79,8 @@ void draw_particles() {
 }
 
 void initialize() {
-    set_initial_particle_positions();
+	setInitialConditions();
+	//testRun();
     startAnimation = false;
     oldTime = 0;
 }
@@ -104,6 +106,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	testRun();
     draw_particles();
     glutSwapBuffers();
 }
