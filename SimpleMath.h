@@ -90,6 +90,8 @@ double distanceVec3(Vec3 u, Vec3 v);
 
 Vec4 multscalarVec4(Vec4 A, double b);
 
+Vec3 multscalarVec3(Vec3 A, double b);
+
 //Matrix operations
 
 Mat4 multMatrix4(Mat4 A, Mat4 B);
@@ -101,5 +103,7 @@ Mat4 getIdentityMatrix4();
 Mat4 multscalarMat4(Mat4 A, double b);
 
 Mat4 sumMatrix4(Mat4 A, Mat4 B);
+
+void invertMatrix(const double * m, double * out);
 
 #endif

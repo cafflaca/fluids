@@ -1,5 +1,4 @@
 #include "BasicLagrangian.h"
-#include "kernel.h"
 
 //Calculate density for each particle (at that position of that particle)
 double calculateTotalDensity(Particle* particle) {
