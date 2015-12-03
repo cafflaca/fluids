@@ -15,7 +15,8 @@
 
 using namespace std; 
 
-
+bool startAnimation;
+int oldTime;
 //Model matrices
 double _matrix[16];
 double _matrixI[16];
@@ -44,6 +45,44 @@ double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
 
+void set_initial_particle_positions(){
+    Vec3 initialVelocity = Vec3(0, 0, 0);
+    
+    for (int k = 0; k < PARTICLE_BLOCK_HEIGHT; k++) {
+        for (int j = 0; j < PARTICLE_BLOCK_WIDTH; j++) {
+            for (int i = 0; i < PARTICLE_BLOCK_LENGTH; i++) {
+                new Particle(
+                             Vec3(
+                                  (double)((double)i * PARTICLE_RADIUS * 2.0),
+                                  (double)j * PARTICLE_RADIUS * 2.0,
+                                  (double)k * PARTICLE_RADIUS * 2.0
+                                  ),
+                             initialVelocity);
+            }
+        }
+    }
+}
+
+void draw_particles() {
+    Vec3 pos = Vec3(0, 0, 0);
+    
+    for (int i = 0; i < Particle::particles.size(); i++) {
+        glPushMatrix();
+        glLoadIdentity();
+        pos = Particle::particles[i]->position;
+        glTranslated(pos.x, pos.y, pos.z);
+        glutSolidSphere(0.05, 100, 100);
+        glPopMatrix();
+    }
+    glPopMatrix();
+}
+
+void initialize() {
+    set_initial_particle_positions();
+    startAnimation = false;
+    oldTime = 0;
+}
+
 
 double vlen(double x, double y, double z)
 {
@@ -56,12 +95,16 @@ void keyboard(unsigned char key, int x, int y) {
         case 27:
             exit(0);
             break;
+        case 32:
+            startAnimation ? startAnimation = false : startAnimation = true;
+            break;
+
     }
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glutSolidSphere(0.05, 100, 100);
+    draw_particles();
     glutSwapBuffers();
 }
 
@@ -223,6 +266,7 @@ int main(int argc, char * argv[]) {
     glutInitWindowSize(500, 500);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Fluid Simulation");
+    initialize();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 
