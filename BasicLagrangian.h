@@ -1,6 +1,8 @@
 #pragma once
 #include "SimpleMath.h"
 #include "Particle.h"
+#include "Kernel.h"
+
 
 const double H = pow(3 * VOLUMEN*NUM_KERNEL_PARTICLES / 4 * PI*NUMBER_PARTICLES, 1.0 / 3);
 const double REST_DENSITY = 998.29;//water

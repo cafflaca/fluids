@@ -4,6 +4,7 @@
 #include "Kernel.h"
 #include "Integration.h"
 #include "Collision.h"
+#include "BasicLagrangian.h"
 
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -17,18 +18,18 @@
 
 using namespace std; 
 
-const double REST_DENSITY = 1000;
-const double STIFFNESS_PARAMETER = 1000;
+//const double REST_DENSITY = 1000;
+//const double STIFFNESS_PARAMETER = 1000;
 
 //TODO: Ning's gravity coefficient and viscousity coefficient
-const double GRAVITY_COEFFICIENT = 9.819;
-const double VISCOUSITY_COEFFICIENT = 0.0091;
+//const double GRAVITY_COEFFICIENT = 9.819;
+//const double VISCOUSITY_COEFFICIENT = 0.0091;
 
 int oldTime;
 bool startAnimation;
 
 //Calculate density for each particle (at that position of that particle)
-double calculateDensity(Particle* particle) {
+/*double calculateDensity(Particle* particle) {
     double h = PARTICLE_RADIUS * 3;//1.0; // radius aroun a given particle to look out for neighbours
 	Vec3 r;
 	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
@@ -46,7 +47,7 @@ double calculateDensity(Particle* particle) {
 // Calculate pressure for each particle(at that position of that particle)
   double calculatePressure(Particle* particle) {
 	  return STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
-   }
+   }*/
     
    double calculateLaplacianPressure(Particle* particle){
         double laplacian = 0;
@@ -57,7 +58,7 @@ double calculateDensity(Particle* particle) {
 		for (unsigned i = 0; i < listNeighbours.size(); i++)
         {
 			r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
-			laplacian += (1.0 / listNeighbours[i]->getDensity()) * listNeighbours[i]->getPressure() * Poly6_kernel_gradient(r, h);
+			laplacian += (1.0 / listNeighbours[i]->getDensity()) * listNeighbours[i]->getPressure() * Poly6_kernel(r, h);
             
         }
         
@@ -93,14 +94,14 @@ double calculateDensity(Particle* particle) {
 			r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
 			
 			//presure part: - gradient p
-			weight = spiky_kernel_gradient(r,h);
+			weight = spiky_kernel(r,h);
 			mFp = -particle->getMass() / listNeighbours[i]->getDensity()*(particle->getPressure() - listNeighbours[i]->getPressure())*weight;
 			mF.x += mFp*r.x;
 			mF.y += mFp*r.y;
 			mF.z += mFp*r.z;
 
 			//viscocity part: nu laplacia u
-			weight = viscous_kernel(r,h);
+			weight = viscosity_kernel(r,h);
 			mF.x += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().x - particle->getVelocity().x) / listNeighbours[i]->getDensity()*weight;
 			mF.y += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().y - particle->getVelocity().y) / listNeighbours[i]->getDensity()*weight;
 			mF.z += VISCOUSITY_COEFFICIENT*particle->getMass()*(listNeighbours[i]->getVelocity().z - particle->getVelocity().z) / listNeighbours[i]->getDensity()*weight;

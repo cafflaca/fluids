@@ -49,6 +49,8 @@ public:
 	Vec3 getVelocity(){ return velocity; };
     void setPosition(Vec3 p){ position = p; };
     void setVelocity(Vec3 v){ velocity = v; };
+    void setDensity(double d){ density = d; };
+    void setPressure(double p){ pressure = p; };
 	double getMass(){ return mass; };
 	double getDensity(){ return density; };
 	double getPressure(){ return pressure; };
