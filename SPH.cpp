@@ -3,6 +3,22 @@
 
 std::vector<Particle*> setInitialConditions(){
 	std::vector<Particle*> initialState;
+
+	Vec3 initialVelocity = Vec3(0, 0, 0);
+
+	for (int k = 0; k < PARTICLE_BLOCK_HEIGHT; k++) {
+		for (int j = 0; j < PARTICLE_BLOCK_WIDTH; j++) {
+			for (int i = 0; i < PARTICLE_BLOCK_LENGTH; i++) {
+				initialState.push_back(new Particle(
+					Vec3(
+					(double)((double)i * PARTICLE_RADIUS * 2.0),
+					(double)j * PARTICLE_RADIUS * 2.0,
+					(double)k * PARTICLE_RADIUS * 2.0
+					),
+					initialVelocity));
+			}
+		}
+	}
 	return initialState;
 }
 

@@ -9,6 +9,7 @@ const double REST_DENSITY = 998.29;//water
 const double STIFFNESS_PARAMETER = 1000;
 const double GRAVITY_COEFFICIENT = 9.819;
 const double VISCOUSITY_COEFFICIENT = 0.0091;
+const double SIGMA = 0.0728;	
 
 
 double calculateTotalDensity(Particle* particle);
@@ -24,3 +25,8 @@ Vec3 calculateGradientPressure(Particle* particle);
 Vec3 calculateViscosity(Particle* particle);
 
 double calculateGravityForce(Particle* particle);
+
+Vec3 calculateSurfaceNormal(Particle* particle);
+
+//Calculate tension force
+Vec3 calculateTensionForce(Particle* particle);
