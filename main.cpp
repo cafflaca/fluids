@@ -1,6 +1,7 @@
 #include <iostream>
 #include <math.h>
 #include "Particle.h"
+#include "SPH.h"
 
 
 #ifdef __APPLE__
@@ -65,7 +66,6 @@ void set_initial_particle_positions(){
 
 void draw_particles() {
     Vec3 pos = Vec3(0, 0, 0);
-    
     for (int i = 0; i < Particle::particles.size(); i++) {
         glPushMatrix();
         glLoadIdentity();
@@ -74,6 +74,7 @@ void draw_particles() {
         glutSolidSphere(0.05, 100, 100);
         glPopMatrix();
     }
+    //cout << "POS: " << pos.x << " " << pos.y << " " << pos.z << endl;
     glPopMatrix();
 }
 
@@ -96,7 +97,7 @@ void keyboard(unsigned char key, int x, int y) {
             exit(0);
             break;
         case 32:
-            startAnimation ? startAnimation = false : startAnimation = true;
+            //startAnimation ? startAnimation = false : startAnimation = true;
             break;
 
     }
@@ -104,11 +105,11 @@ void keyboard(unsigned char key, int x, int y) {
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    testRun();
     draw_particles();
     glutSwapBuffers();
+    glutPostRedisplay();
 }
-
-
 
 
 void pos(double *px, double *py, double *pz, const int x, const int y,
@@ -202,8 +203,6 @@ void mouseMoveEvent(int x, int y)
 		getMatrix();
 		glutPostRedisplay();
 	}
-
-	
 }
 
 void mouseEvent(int button, int state, int x, int y)

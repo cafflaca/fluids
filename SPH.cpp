@@ -1,5 +1,5 @@
 #include "SPH.h"
-#include "Integration.h"
+#include "Particle.h"
 
 std::vector<Particle*> setInitialConditions(){
 	std::vector<Particle*> initialState;
@@ -8,48 +8,50 @@ std::vector<Particle*> setInitialConditions(){
 
 //ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
 void testRun(){
-	std::vector<Particle*> particles = setInitialConditions();
+	//std::vector<Particle*> particles = setInitialConditions();
 
 	std::vector<double> newPressure;
 	std::vector<double> newDensity;
 	//Calculate pressure and density
-	for (unsigned i = 0; i < particles.size(); i++){
-		newDensity.push_back(calculateDensity(particles[i]));
-		newPressure.push_back(calculatePressure(particles[i]));	
+    for (unsigned i = 0; i < Particle::particles.size(); i++){
+		newDensity.push_back(calculateDensity(Particle::particles[i]));
+		newPressure.push_back(calculatePressure(Particle::particles[i]));
 	}
+    
 	//Update density and pressure
-	for (unsigned i = 0; i < particles.size(); i++){
-		particles[i]->setDensity(newDensity[i]);
-		particles[i]->setPressure(newPressure[i]);
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		Particle::particles[i]->setDensity(newDensity[i]);
+		Particle::particles[i]->setPressure(newPressure[i]);
 	}
-
+    std::cout << "dens: " << newDensity[Particle::particles.size() - 1] << std::endl;
+    std::cout << "pres: " << newPressure[Particle::particles.size() - 1] << std::endl;
 	//Calculate internal forces
 	std::vector<Vec3> internalForce;
 
-	for (unsigned i = 0; i < particles.size(); i++){
-		internalForce.push_back(sumVec3(calculateGradientPressure(particles[i]),
-			calculateViscosity(particles[i])));
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i]),
+			calculateViscosity(Particle::particles[i])));
 	}
 
 	//Calculate acceleration
 	std::vector<Vec3> acceleration;
-	for (unsigned i = 0; i < particles.size(); i++){
-		acceleration.push_back(multscalarVec3(internalForce[i], 1.0 / particles[i]->getDensity()));
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		acceleration.push_back(multscalarVec3(internalForce[i], 1.0 / Particle::particles[i]->getDensity()));
 	}
 
 	//Calculate new position and velocity
 	std::vector<Vec3> newPos;
 	std::vector<Vec3> newVel;
 	double delta_t = 0.1;
-	for (unsigned i = 0; i < particles.size(); i++){
-		newVel.push_back(nextVelocity(particles[i], acceleration[i], delta_t));
-		newPos.push_back(nextStep(particles[i], newVel[i], delta_t));
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
+		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));
 	}
 
 	//Update position and velocity
-	for (unsigned i = 0; i < particles.size(); i++){
-		particles[i]->setPosition(newPos[i]);
-		particles[i]->setVelocity(newVel[i]);
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		Particle::particles[i]->setPosition(newPos[i]);
+		Particle::particles[i]->setVelocity(newVel[i]);
 	}
 
 }

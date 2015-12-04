@@ -2,7 +2,7 @@
 
 //Calculate density for each particle (at that position of that particle)
 double calculateTotalDensity(Particle* particle) {
-	double h = 1.0; // radius aroun a given particle to look out for neighbours
+	double h = PARTICLE_RADIUS * 3; //1,0 radius aroun a given particle to look out for neighbours
 	Vec3 r;
 	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
 	double density = 0;
@@ -18,7 +18,7 @@ double calculateTotalDensity(Particle* particle) {
 
 /*Calculate density in the position of the particle i*/
 double calculateDensity(Particle* particle) {
-	double density = 0;
+	double density = particle->getDensity();
 	std::vector<Particle*> particles = particle->find_neighborhood(H);
 	Vec3 r;
 
