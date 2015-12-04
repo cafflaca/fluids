@@ -209,6 +209,12 @@ void mouseMoveEvent(int x, int y)
 	
 }
 
+void timerFunction(int value)
+{
+	glutTimerFunc(10, timerFunction, 1);
+	glutPostRedisplay();
+}
+
 void mouseEvent(int button, int state, int x, int y)
 {
 	int viewport[4];
@@ -272,6 +278,7 @@ int main(int argc, char * argv[]) {
     initialize();
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+	glutTimerFunc(10, timerFunction, 1);
 
 	//mouse interface
 	glutMouseFunc(mouseEvent);

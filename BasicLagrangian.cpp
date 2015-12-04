@@ -17,9 +17,8 @@ double calculateTotalDensity(Particle* particle) {
 }
 
 /*Calculate density in the position of the particle i*/
-double calculateDensity(Particle* particle) {
+double calculateDensity(Particle* particle, std::vector<Particle*> particles) {
 	double density = 0;
-	std::vector<Particle*> particles = particle->find_neighborhood(H);
 	Vec3 r;
 
 	for (unsigned i = 0; i < particles.size();i++){
@@ -31,17 +30,16 @@ double calculateDensity(Particle* particle) {
 
 // Calculate pressure for each particle(at that position of that particle)
 double calculatePressure(Particle* particle) {
-	return STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
+	double temp = STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
+	return temp;
 }
 
 
 //Calculate the gradient of the presuare at the pos of the particle i (symmetring the pressure force)
-Vec3 calculateGradientPressure(Particle* particle){
+Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> particles){
 	Vec3 gradient;
 	Vec3 r;
 	double temp;
-
-	std::vector<Particle*> particles = particle->find_neighborhood(H);
 	
 	for (unsigned i = 0; i < particles.size(); i++)
 	{
@@ -65,12 +63,11 @@ Vec3 calculateGradientPressure(Particle* particle){
 
 
 //Calculate the viscosity force at the position of the particle i
-	Vec3 calculateViscosity(Particle* particle){
+Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 		Vec3 viscosity;
 		Vec3 r;
 		Vec3 vel;
 		double temp;
-		std::vector<Particle*> particles = particle->find_neighborhood(H);
 
 		for (unsigned i = 0; i < particles.size(); i++)
 		{

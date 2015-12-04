@@ -1,6 +1,8 @@
 #include "SPH.h"
 #include "Integration.h"
 
+using namespace std;
+
 std::vector<Particle*> setInitialConditions(){
 	std::vector<Particle*> initialState;
 
@@ -29,22 +31,23 @@ void testRun(){
 	std::vector<double> newPressure;
 	std::vector<double> newDensity;
 	//Calculate pressure and density
+	
 	for (unsigned i = 0; i < particles.size(); i++){
-		newDensity.push_back(calculateDensity(particles[i]));
-		newPressure.push_back(calculatePressure(particles[i]));	
+		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
+		particles[i]->setDensity(calculateDensity(particles[i],particlesList));
+		cout << "Final "<<particles[i]->getDensity()<<", ";
+		cout << particles[i]->getPressure() << endl;
+		particles[i]->setPressure(calculatePressure(particles[i]));
 	}
-	//Update density and pressure
-	for (unsigned i = 0; i < particles.size(); i++){
-		particles[i]->setDensity(newDensity[i]);
-		particles[i]->setPressure(newPressure[i]);
-	}
+
 
 	//Calculate internal forces
 	std::vector<Vec3> internalForce;
 
 	for (unsigned i = 0; i < particles.size(); i++){
-		internalForce.push_back(sumVec3(calculateGradientPressure(particles[i]),
-			calculateViscosity(particles[i])));
+		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
+		internalForce.push_back(sumVec3(calculateGradientPressure(particles[i], particlesList),
+			calculateViscosity(particles[i], particlesList)));
 	}
 
 	//Calculate acceleration

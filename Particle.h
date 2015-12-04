@@ -14,9 +14,10 @@ const double PARTICLE_RADIUS        = 0.05;
 //for a vol of 0.1 needs 5000 particles with 20 kernel particles
 
 const int NUMBER_PARTICLES = 100;
-const int NUM_KERNEL_PARTICLES = 10;
+const int NUM_KERNEL_PARTICLES = 20;
 const double VOLUMEN = 0.1;
 const double DENSITY_WATER = 998.29;
+const double MASS = DENSITY_WATER*VOLUMEN / NUMBER_PARTICLES;
 
 //const double PARTICLE_MASS = 1.0; 
 
