@@ -24,7 +24,7 @@ Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> partic
 
 Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles);
 
-double calculateGravityForce(Particle* particle);
+Vec3 calculateGravityForce(Particle* particle);
 
 Vec3 calculateSurfaceNormal(Particle* particle);
 

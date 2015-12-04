@@ -32,8 +32,6 @@ void testRun(){
 		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
 		particles[i]->setDensity(calculateDensity(particles[i],particlesList));
 		particles[i]->setPressure(calculatePressure(particles[i]));
-		cout << "Final "<<particles[i]->getDensity()<<", ";
-		cout << particles[i]->getPressure() << endl;
 		
 	}
 
@@ -47,16 +45,28 @@ void testRun(){
 			calculateViscosity(particles[i], particlesList)));
 	}
 
+	//Calculate external forces
+	//std::vector<Vec3> externalForce;
+	std::vector<Vec3> gravityForce;
+	//std::vector<Vec3> normal;
+	//std::vector<Vec3> surfaceForce;
+	std::vector<Vec3> totalForce;
+	for (unsigned i = 0; i < particles.size(); i++){
+		gravityForce.push_back(calculateGravityForce(particles[i]));
+		//normal.push_back(calculateSurfaceNormal(particles[i]));	
+		totalForce.push_back(sumVec3(internalForce[i],gravityForce[i]));
+	}
+	
 	//Calculate acceleration
 	std::vector<Vec3> acceleration;
 	for (unsigned i = 0; i < particles.size(); i++){
-		acceleration.push_back(multscalarVec3(internalForce[i], 1.0 / particles[i]->getDensity()));
+		acceleration.push_back(multscalarVec3(totalForce[i], 1.0 / particles[i]->getDensity()));
 	}
 
 	//Calculate new position and velocity
 	std::vector<Vec3> newPos;
 	std::vector<Vec3> newVel;
-	double delta_t = 0.01;
+	double delta_t = 0.5;
 	for (unsigned i = 0; i < particles.size(); i++){
 		newVel.push_back(nextVelocity(particles[i], acceleration[i], delta_t));
 		newPos.push_back(nextStep(particles[i], newVel[i], delta_t));
@@ -64,6 +74,8 @@ void testRun(){
 
 	//Update position and velocity
 	for (unsigned i = 0; i < particles.size(); i++){
+		std::cout << "Position: " << particles[i]->getPosition().x << " " << particles[i]->getPosition().y << " " << particles[i]->getPosition().z
+			<< " Velocity: " << particles[i]->getVelocity().x << " " << particles[i]->getVelocity().y << " " << particles[i]->getVelocity().z << std::endl;
 		Particle::particles[i]->setPosition(newPos[i]);
 		Particle::particles[i]->setVelocity(newVel[i]);
 	}

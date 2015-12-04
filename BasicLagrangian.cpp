@@ -91,8 +91,11 @@ Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 	}
 
 	//Calculate gravity force
-	double calculateGravityForce(Particle* particle){
-		return particle->getDensity()*GRAVITY_COEFFICIENT;
+	Vec3 calculateGravityForce(Particle* particle){
+		Vec3 temp;
+		temp.x = temp.z = 0;
+		temp.y = particle->getDensity()*GRAVITY_COEFFICIENT;
+		return temp;
 	}
 
 	//Calculate surface normal
