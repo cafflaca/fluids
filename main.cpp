@@ -109,6 +109,7 @@ void display() {
 	testRun();
     draw_particles();
     glutSwapBuffers();
+    glutPostRedisplay();
 }
 
 
