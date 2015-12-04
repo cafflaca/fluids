@@ -1,6 +1,7 @@
 #include "SPH.h"
 #include "Particle.h"
-#include "Collision.h"
+
+using namespace std;
 
 std::vector<Particle*> setInitialConditions(){
 	std::vector<Particle*> initialState;
@@ -25,70 +26,58 @@ std::vector<Particle*> setInitialConditions(){
 
 //ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
 void testRun(){
-	//std::vector<Particle*> particles = setInitialConditions();
+	std::vector<Particle*> particles = setInitialConditions();
 
-	std::vector<double> newPressure;
-	std::vector<double> newDensity;
-	//Calculate pressure and density
-    for (unsigned i = 0; i < Particle::particles.size(); i++){
-		newDensity.push_back(calculateDensity(Particle::particles[i]));
-		newPressure.push_back(calculatePressure(Particle::particles[i]));
+	for (unsigned i = 0; i < particles.size(); i++){
+		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
+		particles[i]->setDensity(calculateDensity(particles[i],particlesList));
+		particles[i]->setPressure(calculatePressure(particles[i]));
+		
 	}
-    
-	//Update density and pressure
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		Particle::particles[i]->setDensity(newDensity[i]);
-		Particle::particles[i]->setPressure(newPressure[i]);
-	}
-    //std::cout << "dens: " << newDensity[Particle::particles.size() - 1] << std::endl;
-    //std::cout << "pres: " << newPressure[Particle::particles.size() - 1] << std::endl;
+
+
 	//Calculate internal forces
 	std::vector<Vec3> internalForce;
 
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i]),
-			calculateViscosity(Particle::particles[i])));
+	for (unsigned i = 0; i < particles.size(); i++){
+		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
+		internalForce.push_back(sumVec3(calculateGradientPressure(particles[i], particlesList),
+			calculateViscosity(particles[i], particlesList)));
 	}
-    
-    //std::cout << "force: " << internalForce[Particle::particles.size() - 1].x << " "
-    //<< internalForce[Particle::particles.size() - 1].y << " "
-    //<< internalForce[Particle::particles.size() - 1].z << std::endl;;
 
+	//Calculate external forces
+	//std::vector<Vec3> externalForce;
+	std::vector<Vec3> gravityForce;
+	//std::vector<Vec3> normal;
+	//std::vector<Vec3> surfaceForce;
+	std::vector<Vec3> totalForce;
+	for (unsigned i = 0; i < particles.size(); i++){
+		gravityForce.push_back(calculateGravityForce(particles[i]));
+		//normal.push_back(calculateSurfaceNormal(particles[i]));	
+		totalForce.push_back(sumVec3(internalForce[i],gravityForce[i]));
+	}
+	
 	//Calculate acceleration
 	std::vector<Vec3> acceleration;
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		acceleration.push_back(multscalarVec3(internalForce[i], 1.0 / Particle::particles[i]->getDensity()));
+	for (unsigned i = 0; i < particles.size(); i++){
+		acceleration.push_back(multscalarVec3(totalForce[i], 1.0 / particles[i]->getDensity()));
 	}
-    //std::cout << "acc: " << acceleration[Particle::particles.size() - 1].x << " "
-    //<< acceleration[Particle::particles.size() - 1].y << " "
-    //<< acceleration[Particle::particles.size() - 1].z << std::endl;;
+
 	//Calculate new position and velocity
 	std::vector<Vec3> newPos;
 	std::vector<Vec3> newVel;
-	double delta_t = 0.01;
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
-		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));
+	double delta_t = 0.5;
+	for (unsigned i = 0; i < particles.size(); i++){
+		newVel.push_back(nextVelocity(particles[i], acceleration[i], delta_t));
+		newPos.push_back(nextStep(particles[i], newVel[i], delta_t));
 	}
 
-    std::cout << "v: " << newPos[Particle::particles.size() - 1].x << " "
-    << newPos[Particle::particles.size() - 1].y << " "
-    << newPos[Particle::particles.size() - 1].z << std::endl;;
 	//Update position and velocity
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
+	for (unsigned i = 0; i < particles.size(); i++){
+		std::cout << "Position: " << particles[i]->getPosition().x << " " << particles[i]->getPosition().y << " " << particles[i]->getPosition().z
+			<< " Velocity: " << particles[i]->getVelocity().x << " " << particles[i]->getVelocity().y << " " << particles[i]->getVelocity().z << std::endl;
 		Particle::particles[i]->setPosition(newPos[i]);
-        newVel[i].x *= 10.f;
-        newVel[i].y *= 10.f;
-        newVel[i].z *= 10.f;
-        Particle::particles[i]->setVelocity(newVel[i]);
+		Particle::particles[i]->setVelocity(newVel[i]);
 	}
-    
-    /*for (unsigned i = 0; i < Particle::particles.size(); i++){
-
-        collision_info ci = detect_boundary_collision(Particle::particles[i]);
-        handle_collision(Particle::particles[i], ci, delta_t);
-        //Particle::particles[i]->setPosition(newPos[i]);
-        //Particle::particles[i]->setVelocity(newVel[i]);
-    }*/
 
 }

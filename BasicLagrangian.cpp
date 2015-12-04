@@ -17,31 +17,33 @@ double calculateTotalDensity(Particle* particle) {
 }
 
 /*Calculate density in the position of the particle i*/
-double calculateDensity(Particle* particle) {
-	double density = particle->getDensity();
-	std::vector<Particle*> particles = particle->find_neighborhood(H);
+
+double calculateDensity(Particle* particle, std::vector<Particle*> particles) {
+	double density = 0;
+
 	Vec3 r;
 
-	for (unsigned i = 0; i < particles.size();i++){
-	    r = difVec3(particle->getPosition(), particles[i]->getPosition());
-		density += particles[i]->getMass()*Poly6_kernel(r,H);
+	for (unsigned i = 0; i < particles.size(); i++){
+		r = difVec3(particle->getPosition(), particles[i]->getPosition());
+		density += particles[i]->getMass()*Poly6_kernel(r, H);
 	}
-	return density;	
+	return density;
 }
+
+
 
 // Calculate pressure for each particle(at that position of that particle)
 double calculatePressure(Particle* particle) {
-	return STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
+	double temp = STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
+	return temp;
 }
 
 
 //Calculate the gradient of the presuare at the pos of the particle i (symmetring the pressure force)
-Vec3 calculateGradientPressure(Particle* particle){
+Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> particles){
 	Vec3 gradient;
 	Vec3 r;
 	double temp;
-
-	std::vector<Particle*> particles = particle->find_neighborhood(H);
 	
 	for (unsigned i = 0; i < particles.size(); i++)
 	{
@@ -65,12 +67,11 @@ Vec3 calculateGradientPressure(Particle* particle){
 
 
 //Calculate the viscosity force at the position of the particle i
-	Vec3 calculateViscosity(Particle* particle){
+Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 		Vec3 viscosity;
 		Vec3 r;
 		Vec3 vel;
 		double temp;
-		std::vector<Particle*> particles = particle->find_neighborhood(H);
 
 		for (unsigned i = 0; i < particles.size(); i++)
 		{
@@ -90,8 +91,11 @@ Vec3 calculateGradientPressure(Particle* particle){
 	}
 
 	//Calculate gravity force
-	double calculateGravityForce(Particle* particle){
-		return particle->getDensity()*GRAVITY_COEFFICIENT;
+	Vec3 calculateGravityForce(Particle* particle){
+		Vec3 temp;
+		temp.x = temp.z = 0;
+		temp.y = particle->getDensity()*GRAVITY_COEFFICIENT;
+		return temp;
 	}
 
 	//Calculate surface normal

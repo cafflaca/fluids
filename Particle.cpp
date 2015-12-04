@@ -7,8 +7,8 @@ Particle::Particle(Vec3 position, Vec3 velocity){
 	this->position = position;
 	this->velocity = velocity;
 	density = DENSITY_WATER;
-	pressure=1.0;
-	mass = density*VOLUMEN / NUMBER_PARTICLES; //rho*V/MAX_PARTICLES
+	pressure = 101325;
+	mass = MASS; 
 	
 	label = countParticles; // 0 to totalNumb -1
 	countParticles++;
