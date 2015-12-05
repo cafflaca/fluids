@@ -47,35 +47,35 @@ collision_info detect_boundary_collision(Particle* particle) {
     
     if (pos.x > RIGHT - PARTICLE_RADIUS){
         ci.n.x = -1;
-        std::cout << "x+col" << std::endl;
+       // std::cout << "x+col" << std::endl;
     }
 
     if (pos.x < LEFT + PARTICLE_RADIUS){
         ci.n.x = 1;
-        std::cout << "x-col" << std::endl;
+       // std::cout << "x-col" << std::endl;
 
     }
     if (pos.x > TOP - PARTICLE_RADIUS){
         ci.n.y = -1;
-        std::cout << "y+col" << std::endl;
+       // std::cout << "y+col" << std::endl;
 
     }
     
     if (pos.y < BOTTOM + PARTICLE_RADIUS){
         ci.n.y = 1;
-        std::cout << "y-col" << std::endl;
+      //  std::cout << "y-col" << std::endl;
 
     }
     
     if (pos.z < BACK - PARTICLE_RADIUS){
         ci.n.z = -1;
-        std::cout << "z+col" << std::endl;
+      //  std::cout << "z+col" << std::endl;
 
     }
     
     if (pos.z > FRONT + PARTICLE_RADIUS){
         ci.n.z = 1;
-        std::cout << "z-col" << std::endl;
+      //  std::cout << "z-col" << std::endl;
 
     }
     
@@ -133,7 +133,7 @@ void handle_collision(Particle* particle, collision_info ci, double timestep) {
         res = multscalarVec3(velocity, -1.0f);
     particle->setPosition(ci.cp);
     particle->setVelocity(res);
-        std::cout << "newVel: " << res.x << " " << res.z << " " << res.y << std::endl;
+       // std::cout << "newVel: " << res.x << " " << res.z << " " << res.y << std::endl;
     }
     
 }
