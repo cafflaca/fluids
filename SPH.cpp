@@ -1,5 +1,3 @@
-
-
 #include "SPH.h"
 #include "Particle.h"
 #include "Collision.h"
@@ -77,6 +75,7 @@ void testRun(){
 	std::vector<Vec3> newVel;
 	double delta_t = 0.1;
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		
 		/*newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
 		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));*/
 
