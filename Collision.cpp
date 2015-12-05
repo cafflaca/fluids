@@ -16,18 +16,18 @@ collision_info detect_particle_collision(Particle* particle) {
     collision_info ci;
     ci.collided = false;
     
-   std::vector<Particle*> neighbors = particle->find_neighborhood(RADIUS);
-	//std::vector<Particle*> neighbors = particle->find_neighborhood(H);
-    for (int i = 0; i < neighbors.size(); i++) {
-        double distance = distanceVec3(particle->getPosition(), neighbors[i]->getPosition());
+   //std::vector<Particle*> neighbors = particle->find_neighborhood(RADIUS);
+	particle->find_neighborhood(H);
+    for (int i = 0; i < particle->adjList.size(); i++) {
+		double distance = distanceVec3(particle->getPosition(), particle->adjList[i]->getPosition());
         
         if (distance < (PARTICLE_RADIUS * 2)+ 0.001){
             ci.collided = true;
             ci.d = PARTICLE_RADIUS * 2 - distance;
             ci.cp = Vec3(
-                         ((particle->getPosition()).x + (neighbors[i]->getPosition()).x)/2,
-                         ((particle->getPosition()).y + (neighbors[i]->getPosition()).y)/2,
-                         ((particle->getPosition()).z + (neighbors[i]->getPosition()).z)/2
+				((particle->getPosition()).x + (particle->adjList[i]->getPosition()).x) / 2,
+				((particle->getPosition()).y + (particle->adjList[i]->getPosition()).y) / 2,
+				((particle->getPosition()).z + (particle->adjList[i]->getPosition()).z) / 2
                          );
             ci.n = difVec3(ci.cp, particle->getPosition());
             break;
