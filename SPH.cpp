@@ -1,3 +1,5 @@
+
+
 #include "SPH.h"
 #include "Particle.h"
 #include "Collision.h"
@@ -20,7 +22,7 @@ std::vector<Particle*> setInitialConditions(){
 					j * PARTICLE_RADIUS * 2.0,
 					k * PARTICLE_RADIUS * 2.0),
 					initialVelocity));
-				
+
 			}
 		}
 	}
@@ -73,14 +75,14 @@ void testRun(){
 	//Calculate new position and velocity
 	std::vector<Vec3> newPos;
 	std::vector<Vec3> newVel;
-	double delta_t = 0.01;
+	double delta_t = 0.1;
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
 		/*newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
 		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));*/
 
 		/*Test*/
-		
-		newVel.push_back(leapFrog_vel(Particle::particles[i], acceleration[i], Particle::particles[i]->a_p, Particle::particles[i]->vel_p,delta_t));
+
+		newVel.push_back(leapFrog_vel(Particle::particles[i], acceleration[i], Particle::particles[i]->a_p, Particle::particles[i]->vel_p, delta_t));
 		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));
 	}
 
@@ -100,7 +102,7 @@ void testRun(){
 
 		Particle::particles[i]->setPreviousVelocity(Particle::particles[i]->velocity);
 		Particle::particles[i]->setVelocity(next_vel);
-		
+
 		/*Particle::particles[i]->setPosition(newPos[i]);
 		Particle::particles[i]->setVelocity(newVel[i]);*/
 	}
@@ -110,3 +112,6 @@ void testRun(){
 		handle_collision(Particle::particles[i], ci, delta_t);
 	}
 }
+
+
+

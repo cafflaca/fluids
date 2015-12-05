@@ -13,12 +13,12 @@ const double PARTICLE_BLOCK_HEIGHT  = 10.0;
 
 //for a vol of 0.1 needs 5000 particles with 20 kernel particles
 
-const int NUMBER_PARTICLES = 5000;
+const int NUMBER_PARTICLES = 1000;
 const int NUM_KERNEL_PARTICLES = 20;
 const double VOLUMEN = 0.1;
 const double DENSITY_WATER = 998.29;
-const double MASS = 0.2;//DENSITY_WATER*VOLUMEN / NUMBER_PARTICLES;
-const double H = .0624;//pow(3 * VOLUMEN*NUM_KERNEL_PARTICLES / 4 * PI*NUMBER_PARTICLES, 1.0 / 3);
+const double MASS = DENSITY_WATER*VOLUMEN / NUMBER_PARTICLES;//0.2;//
+const double H = pow(3 * VOLUMEN*NUM_KERNEL_PARTICLES / 4 * PI*NUMBER_PARTICLES, 1.0 / 3); //.0624;//
 const double PARTICLE_RADIUS = 0.1*pow(3 * MASS / 4 * PI*VOLUMEN, 1.0 / 3);
 //const double PARTICLE_MASS = 1.0; 
 

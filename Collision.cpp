@@ -16,8 +16,8 @@ collision_info detect_particle_collision(Particle* particle) {
     collision_info ci;
     ci.collided = false;
     
-   // std::vector<Particle*> neighbors = particle->find_neighborhood(RADIUS);
-	std::vector<Particle*> neighbors = particle->find_neighborhood(H);
+   std::vector<Particle*> neighbors = particle->find_neighborhood(RADIUS);
+	//std::vector<Particle*> neighbors = particle->find_neighborhood(H);
     for (int i = 0; i < neighbors.size(); i++) {
         double distance = distanceVec3(particle->getPosition(), neighbors[i]->getPosition());
         
