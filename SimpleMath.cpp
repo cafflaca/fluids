@@ -227,7 +227,6 @@ double distanceVec3(Vec3 u, Vec3 v){
     return 	sqrt(pow(u.x - v.x, 2) + pow(u.y - v.y, 2) + pow(u.y - v.y, 2));
 }
 
-
 void invertMatrix(const double * m, double * out)
 {
 

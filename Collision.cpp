@@ -21,7 +21,7 @@ collision_info detect_particle_collision(Particle* particle) {
     for (int i = 0; i < neighbors.size(); i++) {
         double distance = distanceVec3(particle->getPosition(), neighbors[i]->getPosition());
         
-        if (distance < (PARTICLE_RADIUS * 2)){
+        if (distance < (PARTICLE_RADIUS * 2)+ 0.001){
             ci.collided = true;
             ci.d = PARTICLE_RADIUS * 2 - distance;
             ci.cp = Vec3(

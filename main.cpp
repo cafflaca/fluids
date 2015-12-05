@@ -45,7 +45,7 @@ double _zNear = 0.1;
 double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
-
+int x = 0;
 
 void draw_particles() {
     Vec3 pos = Vec3(0, 0, 0);
@@ -58,7 +58,7 @@ void draw_particles() {
 		glutSolidSphere(PARTICLE_RADIUS, 100, 100);
         glPopMatrix();
     }
-    cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << endl;
+    //cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << endl;
     glPopMatrix();
 }
 
@@ -82,18 +82,23 @@ void keyboard(unsigned char key, int x, int y) {
             exit(0);
             break;
         case 32:
-            startAnimation ? startAnimation = false : startAnimation = true;
+            //startAnimation ? startAnimation = false : startAnimation = true;
             break;
 
     }
 }
 
 void display() {
+    double newTime = glutGet(GLUT_ELAPSED_TIME);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	testRun();
+    glLoadIdentity();
+    glMultMatrixd(_matrix);
+	testRun(newTime - oldTime);
+    newTime = oldTime;
     draw_particles();
+    //cout << "frame: " << x++ << endl;
     glutSwapBuffers();
-    glutPostRedisplay();
+    //glutPostRedisplay();
 }
 
 
