@@ -18,7 +18,20 @@ using namespace std;
 
 bool startAnimation;
 int oldTime;
+//Model matrices
+double _matrix[16];
+double _matrixI[16];
+/* Mouse Interface  */
+int _mouseX = 0;		/* mouse control variables */
+int _mouseY = 0;
+bool _mouseLeft = false;
+bool _mouseMiddle = false;
+bool _mouseRight = false;
 
+
+double _dragPosX = 0.0;
+double _dragPosY = 0.0;
+double _dragPosZ = 0.0;
 
 //Window parameters
 int width = 1024;
@@ -32,22 +45,7 @@ double _zNear = 0.1;
 double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
-
-//Model matrices
-double _matrix[16];
-double _matrixI[16];
-
-/* Mouse Interface  */
-int _mouseX = 0;		/* mouse control variables */
-int _mouseY = 0;
-bool _mouseLeft = false;
-bool _mouseMiddle = false;
-bool _mouseRight = false;
-
-double _dragPosX = 0.0;
-double _dragPosY = 0.0;
-double _dragPosZ = 0.0;
-
+int x = 0;
 
 void draw_particles() {
     Vec3 pos = Vec3(0, 0, 0);
@@ -57,11 +55,10 @@ void draw_particles() {
         glLoadIdentity();
         pos = Particle::particles[i]->position;
         glTranslated(pos.x, pos.y, pos.z);
-		glColor4f(0.0f, 0.5f, 0.9f, 0.75f);
 		glutSolidSphere(PARTICLE_RADIUS, 100, 100);
         glPopMatrix();
     }
-    cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << endl;
+    //cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << endl;
     glPopMatrix();
 }
 
@@ -85,98 +82,30 @@ void keyboard(unsigned char key, int x, int y) {
             exit(0);
             break;
         case 32:
-            startAnimation ? startAnimation = false : startAnimation = true;
+            //startAnimation ? startAnimation = false : startAnimation = true;
             break;
 
     }
 }
 
-void drawBox(void){
-	//Clear screen and Z - buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Reset transformations
-	glLoadIdentity();
-	glLineWidth(2.0);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glColor4f(0.0f, 1.0f, 0.1f, 1.0f);
-	// White side - BACK
-	glBegin(GL_QUADS);
-	glVertex3f(2, -0.5, 2);
-	glVertex3f(2, 10, 2);
-	glVertex3f(-2, 10, 2);
-	glVertex3f(-2, -0.5, 2);
-	glEnd();
-	glFlush();
-
-	/*// Purple side - RIGHT
-	glBegin(GL_LINE_STRIP);
-	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
-	glVertex3f(2, -0.5, -2);
-	glVertex3f(2, 10, -2);
-	glVertex3f(2, 10, 2);
-	glVertex3f(2, -0.5, 2);
-	glEnd();
-
-	// Green side - LEFT
-	glBegin(GL_LINE_STRIP);
-	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
-	glVertex3f(-2, -0.5, 2);
-	glVertex3f(-2, 10, 2);
-	glVertex3f(-2, 10, -2);
-	glVertex3f(-2, -0.5, -2);
-	glEnd();
-
-	// Blue side - TOP
-	glBegin(GL_LINE_STRIP);
-	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
-	glVertex3f(2, 10, 2);
-	glVertex3f(2, 10, -2);
-	glVertex3f(-2, 10, -2);
-	glVertex3f(-2, 10, 2);
-	glEnd();
-
-	// Red side - BOTTOM
-	glBegin(GL_LINE_STRIP);
-	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
-	glVertex3f(2, -0.5, -2);
-	glVertex3f(2, -0.5, 2);
-	glVertex3f(-2, -0.5, 2);
-	glVertex3f(-2, -0.5, -2);
-	glEnd();*/
-
-}
-
 void display() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glLoadIdentity();
-	glMultMatrixd(_matrix);
-
-	glColor3f(0.5, 0.5, 0.5);
-	glPushMatrix();													//draw terrain
-	glColor3f(0.3, 0.3, 0.3);
-	glBegin(GL_QUADS);
-	glVertex3f(-3, -0.85, 3);
-	glVertex3f(3, -0.85, 3);
-	glVertex3f(3, -0.85, -3);
-	glVertex3f(-3, -0.85, -3);
-	glEnd();
-	glPopMatrix();
-
-	glPushMatrix();
-
-	glPopMatrix();
-
-	glutSwapBuffers();
-
-
-	drawBox();
-	testRun();
+    double newTime = glutGet(GLUT_ELAPSED_TIME);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glLoadIdentity();
+    //glMultMatrixd(_matrix);
+	testRun(newTime - oldTime);
+    //newTime = oldTime;
     draw_particles();
+    //glPushMatrix();
+    //glutSolidSphere(1, 100, 100);
+    //cout << "frame: " << x++ << endl;
+    //glPopMatrix();
     glutSwapBuffers();
     glutPostRedisplay();
 }
+
+
+
 
 void pos(double *px, double *py, double *pz, const int x, const int y,
 	const int *viewport)
@@ -199,125 +128,6 @@ void getMatrix()
 {
 	glGetDoublev(GL_MODELVIEW_MATRIX, _matrix);
 	invertMatrix(_matrix, _matrixI);
-}
-
-void init()
-{
-	glMatrixMode(GL_MODELVIEW_MATRIX);
-
-	//Light values and coordinates
-	GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
-	GLfloat diffuseLight[] = { 0.7f, 0.7f, 0.7f, 1.0f };
-	GLfloat lightPos[] = { 20.0f, 20.0f, 50.0f };
-	glEnable(GL_DEPTH_TEST);
-	glFrontFace(GL_CCW);
-	//glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	// Hidden surface removal // Counterclockwise polygons face out // Do not calculate inside of jet // Enable lighting
-	glEnable(GL_LIGHTING);
-	// Set up and enable light 0
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-	glEnable(GL_LIGHT0);
-	// Enable color tracking
-	glEnable(GL_COLOR_MATERIAL);
-	// Set material properties to follow glColor values
-	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-	glClearColor(0.2f, 0.2f, 0.2f, 3.0f);
-
-	//Rescale normals to unit length
-	glEnable(GL_NORMALIZE);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-
-	glShadeModel(GL_FLAT);
-	getMatrix(); //Init matrix
-
-	//Translate camera
-	glPushMatrix();
-	glLoadIdentity();
-	glTranslatef(0, 0, -5.0);
-	glMultMatrixd(_matrix);
-	getMatrix();
-	glPopMatrix();
-
-}
-
-void changeSize(int w, int h)
-{
-	glViewport(0, 0, w, h);
-
-
-	_top = 1.0;
-	_bottom = -1.0;
-	_left = -(double)w / (double)h;
-	_right = -_left;
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	/* glOrtho(_left,_right,_bottom,_top,_zNear,_zFar);  Ortho */
-	gluPerspective(fovy, (double)w / (double)h, _zNear, _zFar);	/* PErspective for stereo */
-
-	glMatrixMode(GL_MODELVIEW);
-}
-
-void timerFunction(int value)
-{
-	glutTimerFunc(10, timerFunction, 1);
-	glutPostRedisplay();
-}
-
-void mouseEvent(int button, int state, int x, int y)
-{
-	int viewport[4];
-
-	_mouseX = x;
-	_mouseY = y;
-
-	if (state == GLUT_UP)
-		switch (button) {
-		case GLUT_LEFT_BUTTON:
-			_mouseLeft = false;
-			break;
-		case GLUT_MIDDLE_BUTTON:
-			_mouseMiddle = false;
-			break;
-		case GLUT_RIGHT_BUTTON:
-			_mouseRight = false;
-			break;
-	}
-	else
-		switch (button) {
-		case GLUT_LEFT_BUTTON:
-			_mouseLeft = true;
-			break;
-		case GLUT_MIDDLE_BUTTON:
-			_mouseMiddle = true;
-			break;
-		case GLUT_RIGHT_BUTTON:
-			_mouseRight = true;
-			break;
-		case 4:         //Zoomout
-			glLoadIdentity();
-			glTranslatef(0, 0, -0.1);
-			glMultMatrixd(_matrix);
-			getMatrix();
-			glutPostRedisplay();
-			break;
-		case 3:         //Zoomin
-			glLoadIdentity();
-			glTranslatef(0, 0, 0.1);
-			glMultMatrixd(_matrix);
-			getMatrix();
-			glutPostRedisplay();
-			break;
-		default:
-			break;
-			//std::cout<<button<<std::endl;
-	}
-
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	pos(&_dragPosX, &_dragPosY, &_dragPosZ, x, y, viewport);
 }
 
 void mouseMoveEvent(int x, int y)
@@ -389,28 +199,84 @@ void mouseMoveEvent(int x, int y)
 		glutPostRedisplay();
 	}
 
+	
+}
 
+void timerFunction(int value)
+{
+	glutTimerFunc(10, timerFunction, 1);
+	glutPostRedisplay();
+}
+
+void mouseEvent(int button, int state, int x, int y)
+{
+	int viewport[4];
+
+	_mouseX = x;
+	_mouseY = y;
+
+	if (state == GLUT_UP)
+		switch (button) {
+		case GLUT_LEFT_BUTTON:
+			_mouseLeft = false;
+			break;
+		case GLUT_MIDDLE_BUTTON:
+			_mouseMiddle = false;
+			break;
+		case GLUT_RIGHT_BUTTON:
+			_mouseRight = false;
+			break;
+	}
+	else
+		switch (button) {
+		case GLUT_LEFT_BUTTON:
+			_mouseLeft = true;
+			break;
+		case GLUT_MIDDLE_BUTTON:
+			_mouseMiddle = true;
+			break;
+		case GLUT_RIGHT_BUTTON:
+			_mouseRight = true;
+			break;
+		case 4:         //Zoomout
+			glLoadIdentity();
+			glTranslatef(0, 0, -0.1);
+			glMultMatrixd(_matrix);
+			getMatrix();
+			glutPostRedisplay();
+			break;
+		case 3:         //Zoomin
+			glLoadIdentity();
+			glTranslatef(0, 0, 0.1);
+			glMultMatrixd(_matrix);
+			getMatrix();
+			glutPostRedisplay();
+			break;
+		default:
+			break;
+			//std::cout<<button<<std::endl;
+	}
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	pos(&_dragPosX, &_dragPosY, &_dragPosZ, x, y, viewport);
 }
 
 int main(int argc, char * argv[]) {
     
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-	glutInitWindowSize(width, height);
+    glutInitWindowSize(500, 500);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Fluid Simulation");
-	glutDisplayFunc(display);
-	glutReshapeFunc(changeSize);
-	glutKeyboardFunc(keyboard);
-	glutTimerFunc(10, timerFunction, 1);
-
     initialize();
+    glutDisplayFunc(display);
+    glutKeyboardFunc(keyboard);
+	glutTimerFunc(10, timerFunction, 1);
 
 	//mouse interface
 	glutMouseFunc(mouseEvent);
 	glutMotionFunc(mouseMoveEvent);
 
-	init();
     
     glutMainLoop();
     

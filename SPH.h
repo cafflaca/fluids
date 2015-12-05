@@ -7,4 +7,4 @@
 //ToDo
 std::vector<Particle*> setInitialConditions();
 
-void testRun();
+void testRun(double t);

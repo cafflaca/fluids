@@ -60,9 +60,9 @@ Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> partic
 
 	}
 
-	gradient.x *= -particle->getMass();
-	gradient.y *= -particle->getMass();
-	gradient.z *= -particle->getMass();
+	gradient.x *= -particle->getDensity();
+	gradient.y *= -particle->getDensity();
+	gradient.z *= -particle->getDensity();
 
 	return gradient;
 }
@@ -105,12 +105,12 @@ Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 	Vec3 calculateSurfaceNormal(Particle* particle){
 		Vec3 normal;
 		double temp;
-		particle->find_neighborhood(H);
+		std::vector<Particle*> particles = particle->find_neighborhood(H);
 		Vec3 r;
-		for (unsigned i = 0; i < particle->adjList.size(); i++)
+		for (unsigned i = 0; i < particles.size(); i++)
 		{
-			r = difVec3(particle->getPosition(), particle->adjList[i]->getPosition());
-			temp = particle->adjList[i]->getMass() / particle->adjList[i]->getDensity();
+			r = difVec3(particle->getPosition(), particles[i]->getPosition());
+			temp = particles[i]->getMass() / particles[i]->getDensity();
 			normal.x += temp*Poly6_kernel_gradient(r, H).x;
 			normal.y += temp*Poly6_kernel_gradient(r, H).y;
 			normal.z += temp*Poly6_kernel_gradient(r, H).z;
@@ -123,12 +123,12 @@ Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 	Vec3 calculateTensionForce(Particle* particle){
 		Vec3 force;
 		double temp=0;
-		particle->find_neighborhood(H);
+		std::vector<Particle*> particles = particle->find_neighborhood(H);
 		Vec3 r;
-		for (unsigned i = 0; i < particle->adjList.size(); i++)
+		for (unsigned i = 0; i < particles.size(); i++)
 		{
-			r = difVec3(particle->getPosition(), particle->adjList[i]->getPosition());
-			temp += (particle->adjList[i]->getMass() / particle->adjList[i]->getDensity())*Poly6_kernel_laplacian(r, H);
+			r = difVec3(particle->getPosition(), particles[i]->getPosition());
+			temp += (particles[i]->getMass() / particles[i]->getDensity())*Poly6_kernel_laplacian(r,H);
 		}
 		Vec3 normal = calculateSurfaceNormal(particle);
 

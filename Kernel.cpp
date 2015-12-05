@@ -50,16 +50,16 @@ double spiky_kernel(Vec3 pos, double h){
 	return kernel;
 }
 
-Vec3 spiky_kernel_gradient(Vec3 pos, double h){
+Vec3 spiky_kernel_gradient(Vec3 r, double h){
 	Vec3 kernel;
 	double temp = 0;
-	double distance = normVec3(pos);
+	double distance = normVec3(r);
 	if (distance >= 0 && distance <= h)
 	{
-		temp = (-45.0 / (PI * pow(h, 6)*distance)) *pow((h - distance), 2);
-		kernel.x = temp*pos.x;
-		kernel.y = temp*pos.y;
-		kernel.z = temp*pos.z;
+		temp = (-45.0 / (PI * pow(h, 6)* distance)) *pow((h - distance), 2);
+		kernel.x = temp*r.x;
+		kernel.y = temp*r.y;
+		kernel.z = temp*r.z;
 	}
 	
 	return kernel;

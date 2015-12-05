@@ -39,7 +39,7 @@ public:
     Vec3 position;
     Vec3 velocity;
     Vec3 force_densities;
-	std::vector<Particle*> adjList;
+
 	/*Test*/
 	Vec3 vel_p; //
 	Vec3 a_p;
@@ -53,7 +53,6 @@ public:
 	Particle(Vec3 position, Vec3 velocity);
 	Vec3 getPosition(){ return position; };
 	Vec3 getVelocity(){ return velocity; };
-	std::vector<Particle*> getAdjList(){ return adjList; };
 	void setPosition(Vec3 p){ position = p; };
     void setVelocity(Vec3 v){ velocity = v; };
 
@@ -67,7 +66,7 @@ public:
 	double getMass(){ return mass; };
 	double getDensity(){ return density; };
 	double getPressure(){ return pressure; };
-	void find_neighborhood(double  h);
+	std::vector<Particle*> find_neighborhood(double  h);
 	
 
 };
