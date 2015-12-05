@@ -19,7 +19,7 @@
 /*Calculate density in the position of the particle i*/
 
 double calculateDensity(Particle* particle, std::vector<Particle*> particles) {
-	double density = 0;
+	double density = particle->getDensity();
 
 	Vec3 r;
 

@@ -75,6 +75,7 @@ void draw_particles() {
 		glutSolidSphere(PARTICLE_RADIUS, 100, 100);
         glPopMatrix();
     }
+    cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << endl;
     glPopMatrix();
 }
 
@@ -109,6 +110,7 @@ void display() {
 	testRun();
     draw_particles();
     glutSwapBuffers();
+    glutPostRedisplay();
 }
 
 
