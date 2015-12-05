@@ -55,6 +55,7 @@ void draw_particles() {
         glLoadIdentity();
         pos = Particle::particles[i]->position;
         glTranslated(pos.x, pos.y, pos.z);
+		glColor4f(0.0f, 0.5f, 0.9f, 0.75f);
 		glutSolidSphere(PARTICLE_RADIUS, 100, 100);
         glPopMatrix();
     }
@@ -88,8 +89,65 @@ void keyboard(unsigned char key, int x, int y) {
     }
 }
 
+void drawBox(void){
+	//Clear screen and Z - buffer
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Reset transformations
+	glLoadIdentity();
+	glLineWidth(2.0);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glColor4f(0.0f, 1.0f, 0.1f, 1.0f);
+	// White side - BACK
+	glBegin(GL_QUADS);
+	glVertex3f(2, -0.5, 2);
+	glVertex3f(2, 10, 2);
+	glVertex3f(-2, 10, 2);
+	glVertex3f(-2, -0.5, 2);
+	glEnd();
+	glFlush();
+
+	/*// Purple side - RIGHT
+	glBegin(GL_LINE_STRIP);
+	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
+	glVertex3f(2, -0.5, -2);
+	glVertex3f(2, 10, -2);
+	glVertex3f(2, 10, 2);
+	glVertex3f(2, -0.5, 2);
+	glEnd();
+
+	// Green side - LEFT
+	glBegin(GL_LINE_STRIP);
+	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
+	glVertex3f(-2, -0.5, 2);
+	glVertex3f(-2, 10, 2);
+	glVertex3f(-2, 10, -2);
+	glVertex3f(-2, -0.5, -2);
+	glEnd();
+
+	// Blue side - TOP
+	glBegin(GL_LINE_STRIP);
+	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
+	glVertex3f(2, 10, 2);
+	glVertex3f(2, 10, -2);
+	glVertex3f(-2, 10, -2);
+	glVertex3f(-2, 10, 2);
+	glEnd();
+
+	// Red side - BOTTOM
+	glBegin(GL_LINE_STRIP);
+	glColor4f(0.0f, 0.5f, 0.1f, 0.2f);
+	glVertex3f(2, -0.5, -2);
+	glVertex3f(2, -0.5, 2);
+	glVertex3f(-2, -0.5, 2);
+	glVertex3f(-2, -0.5, -2);
+	glEnd();*/
+
+}
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	drawBox();
 	testRun();
     draw_particles();
     glutSwapBuffers();

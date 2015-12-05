@@ -37,10 +37,10 @@ std::vector<Particle*> setInitialConditions(){
 //ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
 void testRun(){
 	//std::vector<Particle*> particles = setInitialConditions();
-
+	
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		std::vector<Particle*> particlesList = Particle::particles[i]->find_neighborhood(H);
-		Particle::particles[i]->setDensity(calculateDensity(Particle::particles[i], particlesList));
+		Particle::particles[i]->find_neighborhood(H);
+		Particle::particles[i]->setDensity(calculateDensity(Particle::particles[i], Particle::particles[i]->adjList));
 		Particle::particles[i]->setPressure(calculatePressure(Particle::particles[i]));
 
 	}
@@ -50,8 +50,8 @@ void testRun(){
 	std::vector<Vec3> internalForce;
 
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		std::vector<Particle*> particlesList = Particle::particles[i]->find_neighborhood(H);
-		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i], particlesList), calculateViscosity(Particle::particles[i], particlesList)));
+		//Particle::particles[i]->find_neighborhood(H);
+		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i], Particle::particles[i]->adjList), calculateViscosity(Particle::particles[i], Particle::particles[i]->adjList)));
 	}
 
 	//Calculate external forces
