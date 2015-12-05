@@ -75,6 +75,7 @@ void draw_particles() {
         glutSolidSphere(0.05, 100, 100);
         glPopMatrix();
     }
+    cout << "pos: " << pos.x << " " << pos.y << " " << pos.z << endl;
     glPopMatrix();
 }
 
