@@ -33,7 +33,7 @@ std::vector<Particle*> setInitialConditions(){
 }
 
 //ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
-void testRun(){
+void testRun(double t){
 	//std::vector<Particle*> particles = setInitialConditions();
 	
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
@@ -51,6 +51,8 @@ void testRun(){
 		//Particle::particles[i]->find_neighborhood(H);
 		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i], Particle::particles[i]->adjList), calculateViscosity(Particle::particles[i], Particle::particles[i]->adjList)));
 	}
+    
+    //cout << "force: " << internalForce[Particle::particles.size() - 1].x << " "<< internalForce[Particle::particles.size() - 1].y << " "<< internalForce[Particle::particles.size() - 1].z << endl;;
 
 	//Calculate external forces
 	//std::vector<Vec3> externalForce;
@@ -75,9 +77,14 @@ void testRun(){
 	std::vector<Vec3> newVel;
 	double delta_t = 0.1;
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
+<<<<<<< HEAD
 		
 		/*newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
 		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));*/
+=======
+		//newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
+		//newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));
+>>>>>>> 0feb12a699c6cfde0ff3fb715b8ed9d7a2ad7df8
 
 		/*Test*/
 
@@ -108,7 +115,8 @@ void testRun(){
 
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
 		collision_info ci = detect_boundary_collision(Particle::particles[i]);
-		handle_collision(Particle::particles[i], ci, delta_t);
+        handle_collision(Particle::particles[i], ci, delta_t);
+        
 	}
 }
 

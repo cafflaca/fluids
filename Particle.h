@@ -8,7 +8,7 @@
 // Initial particle block dimensions
 const double PARTICLE_BLOCK_LENGTH  = 10.0;
 const double PARTICLE_BLOCK_WIDTH   = 10.0;
-const double PARTICLE_BLOCK_HEIGHT  = 10.0;
+const double PARTICLE_BLOCK_HEIGHT  = 5.0;
 
 
 //for a vol of 0.1 needs 5000 particles with 20 kernel particles
