@@ -13,10 +13,9 @@ std::vector<Particle*> setInitialConditions(){
 			for (int i = 0; i < PARTICLE_BLOCK_LENGTH; i++) {
 				initialState.push_back(new Particle(
 					Vec3(
-					(double)((double)i * PARTICLE_RADIUS * 2.0),
-					(double)j * PARTICLE_RADIUS * 2.0,
-					(double)k * PARTICLE_RADIUS * 2.0
-					),
+					i * PARTICLE_RADIUS * 2.0,
+					j * PARTICLE_RADIUS * 2.0,
+					k * PARTICLE_RADIUS * 2.0),
 					initialVelocity));
 			}
 		}
@@ -27,9 +26,10 @@ std::vector<Particle*> setInitialConditions(){
 //ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
 void testRun(){
 	std::vector<Particle*> particles = setInitialConditions();
-
+	std::vector<Particle*> particlesList;
 	for (unsigned i = 0; i < particles.size(); i++){
-		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
+		particlesList = particles[i]->find_neighborhood(H);
+		//cout << particlesList.size() << "\n\n";
 		particles[i]->setDensity(calculateDensity(particles[i],particlesList));
 		particles[i]->setPressure(calculatePressure(particles[i]));
 		
@@ -38,18 +38,18 @@ void testRun(){
 
 	//Calculate internal forces
 	std::vector<Vec3> internalForce;
+	std::vector<Vec3> forceP;
 
 	for (unsigned i = 0; i < particles.size(); i++){
-		std::vector<Particle*> particlesList = particles[i]->find_neighborhood(H);
+		particlesList = particles[i]->find_neighborhood(H);
+		forceP.push_back(calculateGradientPressure(particles[i], particlesList));
 		internalForce.push_back(sumVec3(calculateGradientPressure(particles[i], particlesList),
 			calculateViscosity(particles[i], particlesList)));
+		//cout << "f.x: " << forceP[i].x << " f.y: " << forceP[i].y << " f.z: " << forceP[i].z << endl;
 	}
 
-	//Calculate external forces
-	//std::vector<Vec3> externalForce;
+
 	std::vector<Vec3> gravityForce;
-	//std::vector<Vec3> normal;
-	//std::vector<Vec3> surfaceForce;
 	std::vector<Vec3> totalForce;
 	for (unsigned i = 0; i < particles.size(); i++){
 		gravityForce.push_back(calculateGravityForce(particles[i]));
@@ -59,8 +59,11 @@ void testRun(){
 	
 	//Calculate acceleration
 	std::vector<Vec3> acceleration;
+	Vec3 temp;
 	for (unsigned i = 0; i < particles.size(); i++){
-		acceleration.push_back(multscalarVec3(totalForce[i], 1.0 / particles[i]->getDensity()));
+		temp = Vec3(totalForce[i].x / particles[i]->getDensity(), totalForce[i].y / particles[i]->getDensity(), totalForce[i].z / particles[i]->getDensity());
+		acceleration.push_back(temp);
+		//cout << "a.x: " << acceleration[i].x << " a.y: " << acceleration[i].y << " a.z: " << acceleration[i].z << endl;
 	}
 
 	//Calculate new position and velocity
@@ -74,10 +77,12 @@ void testRun(){
 
 	//Update position and velocity
 	for (unsigned i = 0; i < particles.size(); i++){
-		std::cout << "Position: " << particles[i]->getPosition().x << " " << particles[i]->getPosition().y << " " << particles[i]->getPosition().z
-			<< " Velocity: " << particles[i]->getVelocity().x << " " << particles[i]->getVelocity().y << " " << particles[i]->getVelocity().z << std::endl;
-		Particle::particles[i]->setPosition(newPos[i]);
-		Particle::particles[i]->setVelocity(newVel[i]);
+		/*std::cout << "Position: " << particles[i]->getPosition().x << " " << particles[i]->getPosition().y << " "
+			<< particles[i]->getPosition().z << "\nVelocity: " << particles[i]->getVelocity().x << " "
+			<< particles[i]->getVelocity().y << " " << particles[i]->getVelocity().z << "\nDensity: "
+			<< particles[i]->getDensity() << "\nPressure: " << particles[i]->getPressure() << "\n\n";*/
+		particles[i]->setPosition(newPos[i]);
+		particles[i]->setVelocity(newVel[i]);
 	}
 
 }

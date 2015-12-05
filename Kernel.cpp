@@ -1,4 +1,5 @@
 #include "Kernel.h"
+#include <iostream>
 
 //Pos - Vector between two particles i and j -> rij , h is the compact support radius H
 
@@ -55,7 +56,7 @@ Vec3 spiky_kernel_gradient(Vec3 pos, double h){
 	double distance = normVec3(pos);
 	if (distance >= 0 && distance <= h)
 	{
-		temp = (-45.0 / (PI * pow(h, 6)*distance)) *pow(h - distance, 2);
+		temp = (-45.0 / (PI * pow(h, 6)*distance)) *pow((h - distance), 2);
 		kernel.x = temp*pos.x;
 		kernel.y = temp*pos.y;
 		kernel.z = temp*pos.z;

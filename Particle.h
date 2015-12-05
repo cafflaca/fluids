@@ -9,16 +9,17 @@
 const double PARTICLE_BLOCK_LENGTH  = 10.0;
 const double PARTICLE_BLOCK_WIDTH   = 10.0;
 const double PARTICLE_BLOCK_HEIGHT  = 10.0;
-const double PARTICLE_RADIUS        = 0.05;
+
 
 //for a vol of 0.1 needs 5000 particles with 20 kernel particles
 
-const int NUMBER_PARTICLES = 100;
+const int NUMBER_PARTICLES = 5000;
 const int NUM_KERNEL_PARTICLES = 20;
 const double VOLUMEN = 0.1;
 const double DENSITY_WATER = 998.29;
-const double MASS = DENSITY_WATER*VOLUMEN / NUMBER_PARTICLES;
-
+const double MASS = 0.2;//DENSITY_WATER*VOLUMEN / NUMBER_PARTICLES;
+const double H = .0624;//pow(3 * VOLUMEN*NUM_KERNEL_PARTICLES / 4 * PI*NUMBER_PARTICLES, 1.0 / 3);
+const double PARTICLE_RADIUS = 0.1*pow(3 * MASS / 4 * PI*VOLUMEN, 1.0 / 3);
 //const double PARTICLE_MASS = 1.0; 
 
 //missing initial conditions for each particle. Calculate mass according to the density of the particle and the volumen
@@ -41,7 +42,7 @@ public:
     
     double pressure;
     
-    int label;//Numb. of the particle
+    int index;//Numb. of the particle
     static int countParticles;//How many particles has been created
     static std::vector<Particle*> particles; //keep track of all created particles
     

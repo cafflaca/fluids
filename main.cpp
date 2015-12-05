@@ -67,12 +67,12 @@ double prev_z = 0;
 void draw_particles() {
     Vec3 pos = Vec3(0, 0, 0);
     
-    for (int i = 0; i < Particle::particles.size(); i++) {
+    for (unsigned i = 0; i < Particle::particles.size(); i++) {
         glPushMatrix();
         glLoadIdentity();
         pos = Particle::particles[i]->position;
         glTranslated(pos.x, pos.y, pos.z);
-        glutSolidSphere(0.05, 100, 100);
+		glutSolidSphere(PARTICLE_RADIUS, 100, 100);
         glPopMatrix();
     }
     glPopMatrix();

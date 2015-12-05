@@ -1,7 +1,7 @@
 #include "BasicLagrangian.h"
 
 //Calculate density for each particle (at that position of that particle)
-double calculateTotalDensity(Particle* particle) {
+/*double calculateTotalDensity(Particle* particle) {
 	double h = PARTICLE_RADIUS * 3; //1,0 radius aroun a given particle to look out for neighbours
 	Vec3 r;
 	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
@@ -14,7 +14,7 @@ double calculateTotalDensity(Particle* particle) {
 	}
 
 	return density;
-}
+}*/
 
 /*Calculate density in the position of the particle i*/
 
@@ -34,8 +34,8 @@ double calculateDensity(Particle* particle, std::vector<Particle*> particles) {
 
 // Calculate pressure for each particle(at that position of that particle)
 double calculatePressure(Particle* particle) {
-	double temp = STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
-	return temp;
+	return STIFFNESS_PARAMETER*(particle->getDensity() - REST_DENSITY);
+
 }
 
 
@@ -49,11 +49,14 @@ Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> partic
 	{
 		temp = 0;
 		r = difVec3(particle->getPosition(), particles[i]->getPosition());
+		//std::cout << "r.x: " << r.x << " r.y: " << r.y << " r.z: " << r.z << std::endl;
 		temp = (particle->getPressure() / pow(particle->getDensity(), 2) + particles[i]->getPressure() / pow(particles[i]->getDensity(), 2))*
 			particles[i]->getMass();
+		std::cout << temp << std::endl;
 		gradient.x += temp*spiky_kernel_gradient(r, H).x;
 		gradient.y += temp*spiky_kernel_gradient(r, H).y;
 		gradient.z += temp*spiky_kernel_gradient(r, H).z;
+		
 
 	}
 
