@@ -46,23 +46,6 @@ double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
 
-/*void set_initial_particle_positions(){
-    Vec3 initialVelocity = Vec3(0, 0, 0);
-    
-    for (int k = 0; k < PARTICLE_BLOCK_HEIGHT; k++) {
-        for (int j = 0; j < PARTICLE_BLOCK_WIDTH; j++) {
-            for (int i = 0; i < PARTICLE_BLOCK_LENGTH; i++) {
-                new Particle(
-                             Vec3(
-                                  (double)((double)i * PARTICLE_RADIUS * 2.0),
-                                  (double)j * PARTICLE_RADIUS * 2.0,
-                                  (double)k * PARTICLE_RADIUS * 2.0
-                                  ),
-                             initialVelocity);
-            }
-        }
-    }
-}*/
 
 void draw_particles() {
     Vec3 pos = Vec3(0, 0, 0);

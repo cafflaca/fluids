@@ -39,7 +39,11 @@ public:
     Vec3 position;
     Vec3 velocity;
     Vec3 force_densities;
-    
+
+	/*Test*/
+	Vec3 vel_p; //
+	Vec3 a_p;
+
     double pressure;
     
     int index;//Numb. of the particle
@@ -49,8 +53,14 @@ public:
 	Particle(Vec3 position, Vec3 velocity);
 	Vec3 getPosition(){ return position; };
 	Vec3 getVelocity(){ return velocity; };
-    void setPosition(Vec3 p){ position = p; };
+	void setPosition(Vec3 p){ position = p; };
     void setVelocity(Vec3 v){ velocity = v; };
+
+	Vec3 getPreviousVelocity(){ return vel_p; };
+	void setPreviousVelocity(Vec3 vp){ vel_p = vp; };
+	Vec3 getPreviousAcceleration(){ return a_p; };
+	void setPreviousAcceleration(Vec3 ap){ a_p = ap; };
+
     void setDensity(double d){ density = d; };
     void setPressure(double p){ pressure = p; };
 	double getMass(){ return mass; };

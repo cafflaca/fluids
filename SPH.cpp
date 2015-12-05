@@ -4,6 +4,8 @@
 
 using namespace std;
 
+
+
 std::vector<Particle*> setInitialConditions(){
 	std::vector<Particle*> initialState;
 
@@ -18,8 +20,14 @@ std::vector<Particle*> setInitialConditions(){
 					j * PARTICLE_RADIUS * 2.0,
 					k * PARTICLE_RADIUS * 2.0),
 					initialVelocity));
+				
 			}
 		}
+	}
+	/*Test*/
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		Particle::particles[i]->vel_p = Particle::particles[i]->velocity;
+		Particle::particles[i]->a_p = Vec3(0, 0, 0);
 	}
 	return initialState;
 }
@@ -65,16 +73,36 @@ void testRun(){
 	//Calculate new position and velocity
 	std::vector<Vec3> newPos;
 	std::vector<Vec3> newVel;
-	double delta_t = 0.1;
+	double delta_t = 0.01;
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
+		/*newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
+		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));*/
+
+		/*Test*/
+		
+		newVel.push_back(leapFrog_vel(Particle::particles[i], acceleration[i], Particle::particles[i]->a_p, Particle::particles[i]->vel_p,delta_t));
 		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));
 	}
 
 	//Update position and velocity
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		/*Test*/
 		Particle::particles[i]->setPosition(newPos[i]);
-		Particle::particles[i]->setVelocity(newVel[i]);
+
+		Vec3 vel_half;
+		vel_half.x = Particle::particles[i]->vel_p.x - 0.5*delta_t*Particle::particles[i]->a_p.x;
+		vel_half.y = Particle::particles[i]->vel_p.y - 0.5*delta_t*Particle::particles[i]->a_p.y;
+		vel_half.z = Particle::particles[i]->vel_p.z - 0.5*delta_t*Particle::particles[i]->a_p.z;
+		Vec3 next_vel;
+		next_vel.x = (vel_half.x + newVel[i].x) / 2.0;
+		next_vel.y = (vel_half.y + newVel[i].y) / 2.0;
+		next_vel.z = (vel_half.z + newVel[i].z) / 2.0;
+
+		Particle::particles[i]->setPreviousVelocity(Particle::particles[i]->velocity);
+		Particle::particles[i]->setVelocity(next_vel);
+		
+		/*Particle::particles[i]->setPosition(newPos[i]);
+		Particle::particles[i]->setVelocity(newVel[i]);*/
 	}
 
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
