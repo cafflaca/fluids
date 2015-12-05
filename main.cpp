@@ -20,6 +20,7 @@ using namespace std;
 
 bool startAnimation;
 int oldTime;
+<<<<<<< HEAD
 
 //Window parameters
 int width = 1024;
@@ -43,6 +44,13 @@ double _dragPosY = 0.0;
 double _dragPosZ = 0.0;
 
 
+=======
+
+
+//Window parameters
+int width = 1024;
+int height = 768;
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 ///* Ortho (if used) */
 double _left = 0.0;		/* ortho view volume params */
 double _right = 0.0;
@@ -52,6 +60,21 @@ double _zNear = 0.1;
 double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
+
+//Model matrices
+double _matrix[16];
+double _matrixI[16];
+
+/* Mouse Interface  */
+int _mouseX = 0;		/* mouse control variables */
+int _mouseY = 0;
+bool _mouseLeft = false;
+bool _mouseMiddle = false;
+bool _mouseRight = false;
+
+double _dragPosX = 0.0;
+double _dragPosY = 0.0;
+double _dragPosZ = 0.0;
 
 
 void drawBox(void){
@@ -109,6 +132,7 @@ void drawBox(void){
 
 }
 
+<<<<<<< HEAD
 void draw_particles() {
 	Vec3 pos = Vec3(0, 0, 0);
 	glPushMatrix();
@@ -244,6 +268,39 @@ void invertMatrix(const double * m, double * out)
 
 
 
+=======
+void display() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glLoadIdentity();
+	glMultMatrixd(_matrix);
+
+	glColor3f(0.5, 0.5, 0.5);
+	glPushMatrix();													//draw terrain
+	glColor3f(0.3, 0.3, 0.3);
+	glBegin(GL_QUADS);
+	glVertex3f(-3, -0.85, 3);
+	glVertex3f(3, -0.85, 3);
+	glVertex3f(3, -0.85, -3);
+	glVertex3f(-3, -0.85, -3);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+
+	glPopMatrix();
+
+	glutSwapBuffers();
+
+
+	drawBox();
+	testRun();
+    draw_particles();
+    glutSwapBuffers();
+    glutPostRedisplay();
+}
+
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 void pos(double *px, double *py, double *pz, const int x, const int y,
 	const int *viewport)
 {
@@ -302,14 +359,20 @@ void init()
 	//Translate camera
 	glPushMatrix();
 	glLoadIdentity();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 	glTranslatef(0, 0, -5.0);
 	glMultMatrixd(_matrix);
 	getMatrix();
 	glPopMatrix();
 
+<<<<<<< HEAD
 	setInitialConditions();
 
+=======
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 }
 
 void changeSize(int w, int h)
@@ -330,13 +393,17 @@ void changeSize(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 void timerFunction(int value)
 {
 	glutTimerFunc(10, timerFunction, 1);
 	glutPostRedisplay();
 }
 
+<<<<<<< HEAD
 
 
 
@@ -356,6 +423,8 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 
+=======
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 void mouseEvent(int button, int state, int x, int y)
 {
 	int viewport[4];
@@ -409,7 +478,10 @@ void mouseEvent(int button, int state, int x, int y)
 	pos(&_dragPosX, &_dragPosY, &_dragPosZ, x, y, viewport);
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 void mouseMoveEvent(int x, int y)
 {
 
@@ -479,6 +551,7 @@ void mouseMoveEvent(int x, int y)
 		glutPostRedisplay();
 	}
 
+<<<<<<< HEAD
 
 }
 
@@ -522,6 +595,9 @@ void display() {
 	glutSwapBuffers();
   
    // glutPostRedisplay();
+=======
+
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
 }
 
 
@@ -533,6 +609,7 @@ int main(int argc, char * argv[]) {
 	glutInitWindowSize(width, height);
     glutInitWindowPosition(0, 0);
     glutCreateWindow("Fluid Simulation");
+<<<<<<< HEAD
 
  
 	//mouse interface
@@ -545,6 +622,21 @@ int main(int argc, char * argv[]) {
 	glutReshapeFunc(changeSize);
 	glutTimerFunc(10, timerFunction, 1);
 	init();
+=======
+	glutDisplayFunc(display);
+	glutReshapeFunc(changeSize);
+	glutKeyboardFunc(keyboard);
+	glutTimerFunc(10, timerFunction, 1);
+
+    initialize();
+
+	//mouse interface
+	glutMouseFunc(mouseEvent);
+	glutMotionFunc(mouseMoveEvent);
+
+	init();
+    
+>>>>>>> 00b6e0ae9728fb5854150aaa70cd3e42fc23e108
     glutMainLoop();
     
     return 0;
