@@ -35,7 +35,7 @@ std::vector<Particle*> setInitialConditions(){
 }
 
 //ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
-void testRun(double t){
+void testRun(){
 	//std::vector<Particle*> particles = setInitialConditions();
 	
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
