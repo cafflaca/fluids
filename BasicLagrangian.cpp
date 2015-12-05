@@ -52,7 +52,7 @@ Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> partic
 		//std::cout << "r.x: " << r.x << " r.y: " << r.y << " r.z: " << r.z << std::endl;
 		temp = (particle->getPressure() / pow(particle->getDensity(), 2) + particles[i]->getPressure() / pow(particles[i]->getDensity(), 2))*
 			particles[i]->getMass();
-		std::cout << temp << std::endl;
+		//std::cout << temp << std::endl;
 		gradient.x += temp*spiky_kernel_gradient(r, H).x;
 		gradient.y += temp*spiky_kernel_gradient(r, H).y;
 		gradient.z += temp*spiky_kernel_gradient(r, H).z;
