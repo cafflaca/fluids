@@ -17,3 +17,22 @@ Vec3 nextStep(Particle*particle, Vec3 velocity, double delta_t){
 	nextPos.z = particle->getPosition().z + delta_t*(velocity.z);
 	return nextPos;
 }
+
+Vec3 leapFrog_vel(Particle* particle, Vec3 a, Vec3 a_p, Vec3 p_vel, double delta_t){
+	Vec3 vel_half;
+	vel_half.x = p_vel.x - 0.5*delta_t*a_p.x;
+	vel_half.y = p_vel.y - 0.5*delta_t*a_p.y;
+	vel_half.z = p_vel.z - 0.5*delta_t*a_p.z;
+
+	Vec3 vel_final;
+	vel_final.x = vel_half.x + delta_t*a.x;
+	vel_final.y = vel_half.y + delta_t*a.y;
+	vel_final.z = vel_half.z + delta_t*a.z;
+
+	return vel_final;
+
+}
+
+
+
+
