@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
-#include <windows.h>
+//#include <windows.h>
 #include <math.h>
 #include "Particle.h"
 #include "SPH.h"
@@ -53,6 +53,14 @@ double _zFar = 50.0;
 double fovy = 45.0;
 double prev_z = 0;
 
+// Box dimension
+const double FRONT = 1;
+const double BACK = -1;
+const double LEFT = -1;
+const double RIGHT = 1;
+const double BOTTOM = -0.5;
+const double TOP = 2;
+
 
 void drawBox(void){
 
@@ -61,8 +69,9 @@ void drawBox(void){
 	glLineWidth(2.0);
 	glTranslatef(0.0f, 0.0f, 0.0f);
 	glColor4f(0.0f, 1.0f, 0.1f, 1.0f);
-
-	// White side - BACK
+	
+	glPushMatrix();
+	glLoadIdentity();
 	glBegin(GL_QUADS);
 	glVertex3f(2, -0.5, 2);
 	glVertex3f(2, 10, 2);
@@ -70,6 +79,7 @@ void drawBox(void){
 	glVertex3f(-2, -0.5, 2);
 	glEnd();
 	glFlush();
+	glPopMatrix();
 
 	/*// Purple side - RIGHT
 	glBegin(GL_LINE_STRIP);
@@ -120,6 +130,7 @@ void draw_particles() {
 		glPushMatrix();
 		//glLoadIdentity();
 		glColor4f(0.0f, 0.5f, 0.9f, 0.75f);
+		Particle::particles[i]->find_neighborhood(H);
 		pos = Particle::particles[i]->position;
 		glTranslated(pos.x, pos.y, pos.z);
 
@@ -524,6 +535,47 @@ void display() {
 	// glutPostRedisplay();
 }
 
+void drawBox(void){
+	glPushMatrix();
+
+	glColor3f(1.0f, 0.1f, 1.0f);
+	glLineWidth(2.0);
+
+	// Left box side
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(LEFT - PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glVertex3f(LEFT - PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glVertex3f(LEFT - PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glVertex3f(LEFT - PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glEnd();
+
+	// Right box side
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glEnd();
+
+	//Bottom box side
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(LEFT - PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glVertex3f(LEFT - PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, BOTTOM - PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glEnd();
+
+	//Top box side
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(LEFT - PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glVertex3f(LEFT - PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, BACK - PARTICLE_RADIUS);
+	glVertex3f(RIGHT + PARTICLE_RADIUS, TOP + PARTICLE_RADIUS, FRONT + PARTICLE_RADIUS);
+	glEnd();
+
+	glPopMatrix();
+
+}
 
 
 int main(int argc, char * argv[]) {
