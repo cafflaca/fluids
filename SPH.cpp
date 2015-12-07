@@ -32,61 +32,67 @@ std::vector<Particle*> setInitialConditions(){
 	return initialState;
 }
 
-//ToDo check if this is correct!!  Calculates newPosition and newVelocity for all particles
+
 void testRun(){
-	//std::vector<Particle*> particles = setInitialConditions();
+	
+	double newDensity = 0 ;
+	double newPressure = 0;
 
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
 		Particle::particles[i]->find_neighborhood(H);
-		Particle::particles[i]->setDensity(calculateDensity(Particle::particles[i], Particle::particles[i]->adjList));
-		Particle::particles[i]->setPressure(calculatePressure(Particle::particles[i]));
-
+		newDensity = calculateDensity(Particle::particles[i]);
+		newPressure = calculatePressure(Particle::particles[i]);
+		Particle::particles[i]->setDensity(newDensity);
+		Particle::particles[i]->setPressure(newPressure);
 	}
 
 
 	//Calculate internal forces
 	std::vector<Vec3> internalForce;
-	//Calculate external forces
-	//std::vector<Vec3> externalForce;
-	std::vector<Vec3> gravityForce;
-	//std::vector<Vec3> normal;
-	//std::vector<Vec3> surfaceForce;
-	std::vector<Vec3> totalForce;
-
+	internalForce.clear();
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		Particle::particles[i]->find_neighborhood(H);
-		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i], Particle::particles[i]->adjList), calculateViscosity(Particle::particles[i], Particle::particles[i]->adjList)));
-		gravityForce.push_back(calculateGravityForce(Particle::particles[i]));
-		//normal.push_back(calculateSurfaceNormal(particles[i]));	
-		totalForce.push_back(sumVec3(internalForce[i], gravityForce[i]));
+		//Particle::particles[i]->find_neighborhood(H);
+		internalForce.push_back(sumVec3(calculateGradientPressure(Particle::particles[i]), calculateViscosity(Particle::particles[i])));
 	}
-
-
+	//Calculate external forces
+	std::vector<Vec3> externalForce;
+	std::vector<Vec3> gravityForce;
+	Vec3 normal;
+	std::vector<Vec3> surfaceForce;
+	std::vector<Vec3> totalForce;
+	externalForce.clear();
+	gravityForce.clear();
+	surfaceForce.clear();
+	totalForce.clear();
+	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		gravityForce.push_back(calculateGravityForce(Particle::particles[i]));
+		//Particle::particles[i]->find_neighborhood(H);
+		normal = calculateSurfaceNormal(Particle::particles[i]);
+		if (normVec3(normal) >= SURFACE_THRESHOLD){
+			surfaceForce.push_back(calculateTensionForce(Particle::particles[i], normal));
+		}
+		else{
+			surfaceForce.push_back(Vec3(0,0,0));
+		}
+		externalForce.push_back(sumVec3(gravityForce[i], surfaceForce[i]));
+	}
+	
 	//Calculate acceleration
 	std::vector<Vec3> acceleration;
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		acceleration.push_back(multscalarVec3(totalForce[i], 1.0 / Particle::particles[i]->getDensity()));
-	}
-
 	//Calculate new position and velocity
 	std::vector<Vec3> newPos;
 	std::vector<Vec3> newVel;
-	double delta_t = 0.1;
+	acceleration.clear();
+	newPos.clear();
+	newPos.clear();
+
+	double delta_t = 0.01;
 	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		/*newVel.push_back(nextVelocity(Particle::particles[i], acceleration[i], delta_t));
-		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));*/
 
-		/*Test*/
-
+		totalForce.push_back(sumVec3(internalForce[i], externalForce[i]));
+		acceleration.push_back(multscalarVec3(totalForce[i], 1.0 / Particle::particles[i]->getDensity()));
 		newVel.push_back(leapFrog_vel(Particle::particles[i], acceleration[i], Particle::particles[i]->a_p, Particle::particles[i]->vel_p, delta_t));
 		newPos.push_back(nextStep(Particle::particles[i], newVel[i], delta_t));
-	}
-
-	//Update position and velocity
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
-		/*Test*/
-		Particle::particles[i]->setPosition(newPos[i]);
-
 		Vec3 vel_half;
 		vel_half.x = Particle::particles[i]->vel_p.x - 0.5*delta_t*Particle::particles[i]->a_p.x;
 		vel_half.y = Particle::particles[i]->vel_p.y - 0.5*delta_t*Particle::particles[i]->a_p.y;
@@ -98,15 +104,19 @@ void testRun(){
 
 		Particle::particles[i]->setPreviousVelocity(Particle::particles[i]->velocity);
 		Particle::particles[i]->setVelocity(next_vel);
+		Particle::particles[i]->setPosition(newPos[i]);
 
-		/*Particle::particles[i]->setPosition(newPos[i]);
-		Particle::particles[i]->setVelocity(newVel[i]);*/
-	}
 
-	for (unsigned i = 0; i < Particle::particles.size(); i++){
+		//collision_info ci_p = detect_particle_collision(Particle::particles[i]);
 		collision_info ci = detect_boundary_collision(Particle::particles[i]);
+		//handle_collision(Particle::particles[i], ci_p, delta_t);
 		handle_collision(Particle::particles[i], ci, delta_t);
 	}
+		
+
+	std::cout << acceleration[0].x << " " << acceleration[0].y << " " << acceleration[0].z << " " << std::endl;
+
+
 }
 
 

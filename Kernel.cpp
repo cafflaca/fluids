@@ -7,7 +7,7 @@ double Poly6_kernel(Vec3 pos, double h){
 	double kernel = 0;
 	double distance = normVec3(pos);
 	if (distance <= h &&  distance >= 0){
-		kernel = 315.0 / (64.0 * PI *pow(h, 9)) * pow(h*h - pow(distance,2), 3);
+		kernel = (315.0 / (64.0 * PI *pow(h, 9))) * pow(h*h - pow(distance,2), 3);
 	}
 	return kernel;
 }

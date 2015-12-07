@@ -1,31 +1,17 @@
 #include "BasicLagrangian.h"
 
-//Calculate density for each particle (at that position of that particle)
-/*double calculateTotalDensity(Particle* particle) {
-	double h = PARTICLE_RADIUS * 3; //1,0 radius aroun a given particle to look out for neighbours
-	Vec3 r;
-	std::vector<Particle*> listNeighbours = particle->find_neighborhood(h);
-	double density = 0;
-
-	for (int i = 0; i <listNeighbours.size(); i++)
-	{
-		r = difVec3(particle->getPosition(), listNeighbours[i]->getPosition());
-		density += listNeighbours[i]->getMass()*Poly6_kernel(r, H);
-	}
-
-	return density;
-}*/
 
 /*Calculate density in the position of the particle i*/
 
-double calculateDensity(Particle* particle, std::vector<Particle*> particles) {
-	double density = particle->getDensity();
-
+double calculateDensity(Particle* particle) {
+	std::vector<Particle*> particlesN = particle->getAdjList();
+    double density = particle->getDensity(); //0;//
+	
 	Vec3 r;
 
-	for (unsigned i = 0; i < particles.size(); i++){
-		r = difVec3(particle->getPosition(), particles[i]->getPosition());
-		density += particles[i]->getMass()*Poly6_kernel(r, H);
+	for (unsigned i = 0; i < particlesN.size(); i++){
+		r = difVec3(particle->getPosition(), particlesN[i]->getPosition());
+		density += particlesN[i]->getMass()*Poly6_kernel(r, H);
 	}
 	return density;
 }
@@ -40,18 +26,19 @@ double calculatePressure(Particle* particle) {
 
 
 //Calculate the gradient of the presuare at the pos of the particle i (symmetring the pressure force)
-Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> particles){
+Vec3 calculateGradientPressure(Particle* particle){
+	std::vector<Particle*> particlesN = particle->getAdjList();
 	Vec3 gradient;
 	Vec3 r;
-	double temp;
+	double temp=0;
 	
-	for (unsigned i = 0; i < particles.size(); i++)
+	for (unsigned i = 0; i < particlesN.size(); i++)
 	{
-		temp = 0;
-		r = difVec3(particle->getPosition(), particles[i]->getPosition());
+		//temp = 0;
+		r = difVec3(particle->getPosition(), particlesN[i]->getPosition());
 		//std::cout << "r.x: " << r.x << " r.y: " << r.y << " r.z: " << r.z << std::endl;
-		temp = (particle->getPressure() / pow(particle->getDensity(), 2) + particles[i]->getPressure() / pow(particles[i]->getDensity(), 2))*
-			particles[i]->getMass();
+		temp = ((particle->getPressure() / pow(particle->getDensity(), 2)) + (particlesN[i]->getPressure() / pow(particlesN[i]->getDensity(), 2)))
+			*particlesN[i]->getMass();
 		//std::cout << temp << std::endl;
 		gradient.x += temp*spiky_kernel_gradient(r, H).x;
 		gradient.y += temp*spiky_kernel_gradient(r, H).y;
@@ -60,9 +47,9 @@ Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> partic
 
 	}
 
-	gradient.x *= -particle->getMass();
-	gradient.y *= -particle->getMass();
-	gradient.z *= -particle->getMass();
+	gradient.x *= -particle->getDensity();
+	gradient.y *= -particle->getDensity();
+	gradient.z *= -particle->getDensity();
 
 	return gradient;
 }
@@ -70,25 +57,26 @@ Vec3 calculateGradientPressure(Particle* particle, std::vector<Particle*> partic
 
 
 //Calculate the viscosity force at the position of the particle i
-Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
-		Vec3 viscosity;
+Vec3 calculateViscosity(Particle* particle){
+	std::vector<Particle*> particlesN = particle->getAdjList();
+	Vec3 viscosity;
 		Vec3 r;
 		Vec3 vel;
-		double temp;
+		double temp=0;
 
-		for (unsigned i = 0; i < particles.size(); i++)
+		for (unsigned i = 0; i < particlesN.size(); i++)
 		{
-			r = difVec3(particle->getPosition(), particles[i]->getPosition());
-			temp = particles[i]->getMass()*viscosity_laplacian_kernel(r,H);
-			vel = difVec3(particles[i]->getVelocity(), particle->getVelocity());
+			r = difVec3(particle->getPosition(), particlesN[i]->getPosition());
+			temp = (particlesN[i]->getMass() / particlesN[i]->getDensity())*viscosity_laplacian_kernel(r, H);
+			vel = difVec3(particlesN[i]->getVelocity(), particle->getVelocity());
 			viscosity.x += vel.x*temp;
 			viscosity.y += vel.y*temp;
 			viscosity.z += vel.z*temp;
 		}
 
-		viscosity.x *= VISCOUSITY_COEFFICIENT / particle->getDensity();
-		viscosity.y *= VISCOUSITY_COEFFICIENT / particle->getDensity();
-		viscosity.z *= VISCOUSITY_COEFFICIENT / particle->getDensity();
+		viscosity.x *= VISCOUSITY_COEFFICIENT ;
+		viscosity.y *= VISCOUSITY_COEFFICIENT ;
+		viscosity.z *= VISCOUSITY_COEFFICIENT ;
 
 		return viscosity;
 	}
@@ -96,21 +84,22 @@ Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 	//Calculate gravity force
 	Vec3 calculateGravityForce(Particle* particle){
 		Vec3 temp;
-		temp.x = temp.z = 0;
-		temp.y = particle->getDensity()*GRAVITY_COEFFICIENT;
+		temp.x = particle->getDensity()*GRAVITY_COEFFICIENT.x;
+		temp.y = particle->getDensity()*GRAVITY_COEFFICIENT.y;
+		temp.z = particle->getDensity()*GRAVITY_COEFFICIENT.z;
 		return temp;
 	}
 
 	//Calculate surface normal
 	Vec3 calculateSurfaceNormal(Particle* particle){
+		std::vector<Particle*> particlesN = particle->getAdjList();
 		Vec3 normal;
-		double temp;
-		particle->find_neighborhood(H);
+		double temp=0;
 		Vec3 r;
-		for (unsigned i = 0; i < particle->adjList.size(); i++)
+		for (unsigned i = 0; i < particlesN.size(); i++)
 		{
-			r = difVec3(particle->getPosition(), particle->adjList[i]->getPosition());
-			temp = particle->adjList[i]->getMass() / particle->adjList[i]->getDensity();
+			r = difVec3(particle->getPosition(), particlesN[i]->getPosition());
+			temp = particlesN[i]->getMass() / particlesN[i]->getDensity();
 			normal.x += temp*Poly6_kernel_gradient(r, H).x;
 			normal.y += temp*Poly6_kernel_gradient(r, H).y;
 			normal.z += temp*Poly6_kernel_gradient(r, H).z;
@@ -120,21 +109,21 @@ Vec3 calculateViscosity(Particle* particle, std::vector<Particle*> particles){
 	}
 
 	//Calculate tension force
-	Vec3 calculateTensionForce(Particle* particle){
+	Vec3 calculateTensionForce(Particle* particle, Vec3 normal){
+		std::vector<Particle*> particlesN = particle->getAdjList();
 		Vec3 force;
 		double temp=0;
-		particle->find_neighborhood(H);
 		Vec3 r;
-		for (unsigned i = 0; i < particle->adjList.size(); i++)
+		for (unsigned i = 0; i < particlesN.size(); i++)
 		{
-			r = difVec3(particle->getPosition(), particle->adjList[i]->getPosition());
-			temp += (particle->adjList[i]->getMass() / particle->adjList[i]->getDensity())*Poly6_kernel_laplacian(r, H);
+			r = difVec3(particle->getPosition(), particlesN[i]->getPosition());
+			temp += (particlesN[i]->getMass() / particlesN[i]->getDensity())*Poly6_kernel_laplacian(r, H);
 		}
-		Vec3 normal = calculateSurfaceNormal(particle);
+		
 
-		force.x = -SIGMA*temp*normal.x / normVec3(normal);
-		force.y = -SIGMA*temp*normal.y / normVec3(normal);
-		force.z = -SIGMA*temp*normal.z / normVec3(normal);
+		force.x = -SURFACE_TENSION*temp*normal.x / normVec3(normal);
+		force.y = -SURFACE_TENSION*temp*normal.y / normVec3(normal);
+		force.z = -SURFACE_TENSION*temp*normal.z / normVec3(normal);
 
 		return force;
 		
