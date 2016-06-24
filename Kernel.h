@@ -9,7 +9,7 @@ double Poly6_kernel_laplacian(Vec3 pos, double h);
 
 double spiky_kernel(Vec3 pos, double h);
 
-Vec3 spiky_kernel_gradient(Vec3 r, double h);
+Vec3 spiky_kernel_gradient(Vec3 pos, double h);
 
 double viscosity_kernel(Vec3 pos, double h);
 

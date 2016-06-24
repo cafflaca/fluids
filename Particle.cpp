@@ -15,19 +15,22 @@ Particle::Particle(Vec3 position, Vec3 velocity){
 	particles.push_back(this);
 }
 
-
-std::vector<Particle*>Particle::find_neighborhood(double  h){
-	double distance = 0;
-	std::vector<Particle*> list;
-
-	for (int i = 0; i < countParticles; i++){
+void Particle::find_neighborhood(double  h){
+	double distance;
+	adjList.clear();
+	for (int i = 0; i < particles.size(); i++){
 		if (i != index){
+			distance = 0;
 			distance = distanceVec3(position, particles[i]->getPosition());
 			if (distance <= h){
-				list.push_back(particles[i]);
+				adjList.push_back(particles[i]);
 			}
 		}
+
 	}
-	return list;
+
+	/*std::cout << " Number of neighbors: " << this->adjList.size() << std::endl;
+	std::cout << "Sample size: " << countParticles << " or " << particles.size() << std::endl;*/
+
 }
  

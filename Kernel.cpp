@@ -7,7 +7,7 @@ double Poly6_kernel(Vec3 pos, double h){
 	double kernel = 0;
 	double distance = normVec3(pos);
 	if (distance <= h &&  distance >= 0){
-		kernel = 315.0 / (64.0 * PI *pow(h, 9)) * pow(h*h - pow(distance,2), 3);
+		kernel = (315.0 / (64.0 * PI *pow(h, 9))) * pow(h*h - pow(distance,2), 3);
 	}
 	return kernel;
 }
@@ -50,16 +50,16 @@ double spiky_kernel(Vec3 pos, double h){
 	return kernel;
 }
 
-Vec3 spiky_kernel_gradient(Vec3 r, double h){
+Vec3 spiky_kernel_gradient(Vec3 pos, double h){
 	Vec3 kernel;
 	double temp = 0;
-	double distance = normVec3(r);
+	double distance = normVec3(pos);
 	if (distance >= 0 && distance <= h)
 	{
-		temp = (-45.0 / (PI * pow(h, 6)* distance)) *pow((h - distance), 2);
-		kernel.x = temp*r.x;
-		kernel.y = temp*r.y;
-		kernel.z = temp*r.z;
+		temp = (-45.0 / (PI * pow(h, 6)*distance)) *pow((h - distance), 2);
+		kernel.x = temp*pos.x;
+		kernel.y = temp*pos.y;
+		kernel.z = temp*pos.z;
 	}
 	
 	return kernel;
