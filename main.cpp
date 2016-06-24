@@ -62,10 +62,10 @@ const double BOTTOM = -0.5;
 const double TOP = 2;
 
 
-//void drawBox(void){
+void drawBox(void){
 
 	// Reset transformations
-	/*glLoadIdentity();
+	glLoadIdentity();
 	glLineWidth(2.0);
 	glTranslatef(0.0f, 0.0f, 0.0f);
 	glColor4f(0.0f, 1.0f, 0.1f, 1.0f);
@@ -79,7 +79,7 @@ const double TOP = 2;
 	glVertex3f(-2, -0.5, 2);
 	glEnd();
 	glFlush();
-	glPopMatrix();*/
+	glPopMatrix();
 
 	/*// Purple side - RIGHT
 	glBegin(GL_LINE_STRIP);
@@ -117,7 +117,7 @@ const double TOP = 2;
 	glVertex3f(-2, -0.5, -2);
 	glEnd();*/
 
-//}
+}
 
 void draw_particles() {
 	Vec3 pos = Vec3(0, 0, 0);
